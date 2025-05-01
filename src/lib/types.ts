@@ -23,7 +23,7 @@ export enum Location {
   HABANA_VIEJA = 'HABANA_VIEJA',
 }
 
-enum EmployeeRole {
+export enum EmployeeRole {
   CEO = "CEO",
   HR_MANAGER = "HR_MANAGER",
   ACCOUNTING_MANAGER = "ACCOUNTING_MANAGER",

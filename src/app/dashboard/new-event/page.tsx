@@ -51,48 +51,98 @@ function CreateEvent() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    const name = data.get('name') as string;
-    const cant = data.get('cant') as string;
-
-    if(!name || !cant || !dateRange?.from || !dateRange?.to || !location || !selectedType) {
+    
+    // Obtenemos y sanitizamos los valores
+    const name = (data.get('name') as string).trim();
+    const cant = (data.get('cant') as string).trim();
+    
+    // Creamos fecha de hoy sin horas/minutos/segundos
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+  
+    // Validación de campos vacíos y tipos correctos
+    const missingFields = [];
+    if (!name) missingFields.push("Event name");
+    if (!cant) missingFields.push("Guests quantity");
+    if (!dateRange?.from) missingFields.push("Start date");
+    if (!dateRange?.to) missingFields.push("End date");
+    if (!location) missingFields.push("Event place");
+    if (!selectedType) missingFields.push("Event type");
+  
+    if (missingFields.length > 0) {
       return Swal.fire({
         title: "Fields missing",
-        text: `Please fill out all required fields${!name && ", Event name"}${!cant && ", Guests quantity"}${!location && ", Event place"}${!selectedType && ", Event type"}`,
+        text: `Please fill out all required fields: ${missingFields.join(', ')}`,
+        icon: "error",
+        confirmButtonColor: "black",
+        iconColor: "black",
+      });
+    }
+  
+    if (isNaN(parseInt(cant, 10)) || parseInt(cant, 10) <= 0) {
+      return Swal.fire({
+        title: "Invalid quantity",
+        text: "Guests quantity must be a valid number greater than 0",
+        icon: "error",
+        confirmButtonColor: "black",
+        iconColor: "black",
+      });
+    }
+  
+    if(dateRange?.from === undefined || dateRange?.to === undefined) {
+      return Swal.fire({
+        title: "Invalid date range",
+        text: "Please select a valid date range",
         icon: "error",
         confirmButtonColor: "black",
         iconColor: "black",
       });
     }
 
-    if(format(dateRange.from, 'PP') < format(new Date(Date.now()), 'PP'))
+    const startDate = new Date(dateRange.from);
+    startDate.setHours(0, 0, 0, 0);
+    
+    if (startDate < today) {
       return Swal.fire({
         title: "Wrong date range",
-        text: `The start date cannot be before today: ${format(new Date(Date.now()), 'PP')}. Please select another date past today`,
+        text: `The start date cannot be before today: ${format(today, 'PP')}. Please select another date past today`,
         icon: "error",
         confirmButtonColor: "black",
         iconColor: "black",
       });
-    
-      const event: Event = {
-        id: 0, 
-        name,
-        type: selectedType as EventType,
-        startDate: dateRange.from.toISOString(),
-        endDate: dateRange.to.toISOString(),
-        location: location as Location,
-        amount: parseInt(cant, 10)
-      }
-    createEvent(event)
-
+    }
+  
+    if (dateRange.from > dateRange.to) {
+      return Swal.fire({
+        title: "Invalid dates",
+        text: "End date cannot be before start date",
+        icon: "error",
+        confirmButtonColor: "black",
+        iconColor: "black",
+      });
+    }
+  
+    const event: Event = {
+      id: 0,
+      name,
+      type: selectedType as EventType,
+      startDate: dateRange.from.toISOString(),
+      endDate: dateRange.to.toISOString(),
+      location: location as Location,
+      amount: parseInt(cant, 10)
+    };
+  
+    createEvent(event);
+  
     Swal.fire({
       title: "New Event",
       html: `
         <div class="text-left">
-          <p>Name: ${name}</p>
-          <p>Guests: ${cant}</p>
-          <p>Dates: ${format(dateRange.from, 'PP')} - ${format(dateRange.to, 'PP')}</p>
-          <p>Guests: ${location}</p>
-          <p>Guests: ${selectedType}</p>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Guests:</strong> ${cant}</p>
+          <p><strong>Dates:</strong> ${format(dateRange.from, 'PP')} - ${format(dateRange.to, 'PP')}</p>
+          <p><strong>Location:</strong> ${location}</p>
+          <p><strong>Type:</strong> ${selectedType}</p>
         </div>
       `,
       icon: "success",
@@ -101,7 +151,7 @@ function CreateEvent() {
     });
     
     router.push(`../dashboard/resources/${1}`);
-  }
+  };
 
   return (
     <div>

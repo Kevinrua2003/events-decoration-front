@@ -2,7 +2,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
-import { EventType } from "@/lib/types"
+import { EmployeeRole, EventType } from "@/lib/types"
 import { LucideIcon } from "lucide-react"
 
 export default function ToggleItemsSelector({ 
@@ -12,7 +12,7 @@ export default function ToggleItemsSelector({
 }: { 
   items: {
     id: number
-    name: EventType
+    name: EventType | EmployeeRole
     icon: LucideIcon
   }[]
   value?: string
@@ -27,13 +27,13 @@ export default function ToggleItemsSelector({
     >
       {items.map((item) => (
         <ToggleGroupItem 
-          className="m-1 p-1 border-2 rounded-md border-black"
+          className="m-1 p-1 border-2 rounded-md border-black text-wrap"
           key={item.id} 
           value={item.name.toString()}
           aria-label={`Select ${item.name}`}
         >
-          <item.icon className="h-4 w-4 mr-2"/>
-          {item.name}
+          <item.icon className="h-4 w-4 mr-2 text-wrap"/>
+          {item.name.length >= 10 ? item.name.substring(0,10) + '...' : item.name}
         </ToggleGroupItem>
       ))}
     </ToggleGroup>

@@ -40,38 +40,6 @@ function page() {
     filterEmployees();
   }, [search]);
 
-  function handleCreate() {
-    Swal.fire({
-      title: 'Create new employee',
-      html: `
-        <input id="firstName" class="swal2-input" placeholder="First Name">
-        <input id="lastName" class="swal2-input" placeholder="Last Name">
-        <input id="email" class="swal2-input" placeholder="Email">
-        <input id="phone" class="swal2-input" placeholder="Phone">
-        <input id="role" class="swal2-input" placeholder="Role">
-        <input id="username" class="swal2-input" placeholder="Username">
-        <input id="password" type='password' class="swal2-input" placeholder="Password">`,
-      focusConfirm: false,
-      preConfirm: () => {
-        const firstName = (document.getElementById('firstName') as HTMLInputElement).value;
-        const lastName = (document.getElementById('lastName') as HTMLInputElement).value;
-        const email = (document.getElementById('email') as HTMLInputElement).value;
-        const phone = (document.getElementById('phone') as HTMLInputElement).value;
-        const role = (document.getElementById('role') as HTMLInputElement).value;
-        const username = (document.getElementById('username') as HTMLInputElement).value;
-        const password = (document.getElementById('password') as HTMLInputElement).value;
-
-        return { firstName, lastName, email, phone, role, username, password };
-      },
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await createEmployee(result.value);
-        setEmployees((prev) => [...prev, result.value]);
-        Swal.fire('Created!', 'Employee has been created.', 'success');
-      }
-    })
-  }
-
   function onDelete(id: number) {
     return async () => {
       const result = await Swal.fire({
@@ -101,7 +69,7 @@ function page() {
               placeholder="Search employees by email or name"
               onKeyUp={e => setSearch(e.currentTarget.value)}
               />
-            <Button onClick={() => handleCreate()} variant='default'>
+            <Button onClick={() => router.push("new-employee")} variant='default'>
             <UserPlus2Icon/>
             <span className="text-sm">Add new employee</span>
           </Button>
