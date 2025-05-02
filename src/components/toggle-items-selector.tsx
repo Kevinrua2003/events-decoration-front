@@ -23,17 +23,22 @@ export default function ToggleItemsSelector({
       type="single" 
       value={value}
       onValueChange={onValueChange}
-      className="flex w-full"
+      className="w-full grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-3 justify-center"
     >
       {items.map((item) => (
         <ToggleGroupItem 
-          className="m-1 p-1 border-2 rounded-md border-black text-wrap"
+          className="w-full px-4 py-2 border-2 rounded-md border-black 
+                    whitespace-normal break-words h-auto min-h-[60px] 
+                    flex flex-col items-center justify-center gap-1
+                    hover:bg-gray-50 data-[state=on]:bg-black data-[state=on]:text-white"
           key={item.id} 
           value={item.name.toString()}
           aria-label={`Select ${item.name}`}
         >
-          <item.icon className="h-4 w-4 mr-2 text-wrap"/>
-          {item.name.length >= 10 ? item.name.substring(0,10) + '...' : item.name}
+          <item.icon className="h-5 w-5 flex-shrink-0"/>
+          <span className="text-xs font-medium leading-tight">
+            {item.name.length > 15 ? `${item.name.substring(0,15)}...` : item.name}
+          </span>
         </ToggleGroupItem>
       ))}
     </ToggleGroup>

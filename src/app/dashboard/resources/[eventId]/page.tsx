@@ -9,15 +9,28 @@ import { getProducts } from '@/api/products/main';
 import { getServices } from '@/api/services/main';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Swal from 'sweetalert2';
+import ServiceItem from '@/components/service-item';
 
 
 
 function ProductsContainer({products}: {products: Product[]}){
   return (
-    <ScrollArea className='h-[500px] w-full rounded-md border p-1'>
+    <ScrollArea className='h-[calc(110vh-200px)] w-full rounded-md border p-1'>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
         {products.map(item => (
           <ProductCard key={item.id} product={item}/>
+        ))}
+      </div>
+    </ScrollArea>
+  )
+}
+
+function ServicesContainer({services}: {services: Service[]}){
+  return (
+    <ScrollArea className='h-[calc(110vh-200px)] w-full rounded-md border p-1'>
+      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-4 w-full">
+        {services.map(item => (
+          <ServiceItem key={item.id} service={item}/>
         ))}
       </div>
     </ScrollArea>
@@ -61,16 +74,7 @@ function ResourcesPage() {
             <ProductsContainer products={products}/>
           </TabsContent>
           <TabsContent value="services" className="mt-4">
-            <ul>
-              {services.map((item) => {
-                return (
-                  <li key={item.id}>
-                    {item.name}
-                    <span>{item.price}</span>
-                  </li>
-                );
-              })}
-            </ul>
+            <ServicesContainer services={services}/>
           </TabsContent>
         </Tabs>
       </div>      

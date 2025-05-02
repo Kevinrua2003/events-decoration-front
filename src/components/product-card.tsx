@@ -9,7 +9,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <Card className="w-full max-w-xs overflow-hidden transition-all hover:shadow-md border border-gray-200 rounded-md p-2">
+    <Card className="w-full hover:scale-[1.02] max-w-xs overflow-hidden transition-all hover:shadow-md border border-gray-200 rounded-md p-2">
       <div className="relative h-24 md:h-28 w-full">
         <Image
           src={product.image || "/placeholder.svg?height=128&width=256"}
