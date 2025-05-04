@@ -2,12 +2,21 @@ import Image from "next/image"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Product } from "@/lib/types"
+import { Button } from "./ui/button"
+import { PlusIcon } from "lucide-react"
+import Swal from "sweetalert2"
+import { useState } from "react"
 
 interface ProductCardProps {
   product: Product
+  value: number[]
+  onValueChange: (item: number[]) => void
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, value, onValueChange }: ProductCardProps) {
+
+  const isAdded = value.includes(product.id);
+
   return (
     <Card className="w-full hover:scale-[1.02] max-w-xs overflow-hidden transition-all hover:shadow-md border border-gray-200 rounded-md p-2">
       <div className="relative h-24 md:h-28 w-full">
@@ -27,9 +36,16 @@ export function ProductCard({ product }: ProductCardProps) {
         <Badge className="text-sm" variant="secondary">
           ${product.price.toFixed(2)}
         </Badge>
-        <button className="text-xs font-medium text-blue-600 hover:underline">
-          Details
-        </button>
+        <Button 
+        variant={"default"} 
+        disabled={isAdded} 
+        onClick={() => {
+          const newItems = isAdded ? value.filter(id => id !== product.id) : [...value, product.id];          
+          onValueChange(newItems);
+        }}
+        >
+          {isAdded ? "Selected" : "+ Add"}
+        </Button>
       </CardFooter>
     </Card>
   )

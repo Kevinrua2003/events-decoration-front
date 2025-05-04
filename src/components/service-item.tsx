@@ -1,12 +1,20 @@
 import { Service } from '@/lib/types';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@radix-ui/react-hover-card';
-import React from 'react'
+import { PlusIcon } from 'lucide-react';
+import React, { useState } from 'react'
+import Swal from 'sweetalert2';
+import { Button } from './ui/button';
 
 interface ServiceItemProps {
     service: Service
+    value: number[]
+    onValueChange: (items: number[]) => void
 }
 
-function ServiceItem({ service }: ServiceItemProps) {
+function ServiceItem({ service, value, onValueChange }: ServiceItemProps) {
+
+  const isAdded = value.includes(service.id);
+
   return (
     <HoverCard openDelay={300} closeDelay={200}>
       <HoverCardTrigger asChild>
@@ -15,7 +23,6 @@ function ServiceItem({ service }: ServiceItemProps) {
           tabIndex={0}
           className="group grid grid-cols-2 md:grid-cols-4 gap-2 p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:bg-gray-50/50 cursor-pointer"
         >
-          {/* Contenido existente sin cambios */}
           <div className="space-y-1">
             <p className="text-xs font-semibold text-gray-500 uppercase">Service</p>
             <p className="font-medium text-gray-900 truncate">
@@ -62,6 +69,16 @@ function ServiceItem({ service }: ServiceItemProps) {
             <span className="text-xs font-mono text-gray-500">
               Provider: #{service.providerId}
             </span>
+            <Button 
+              variant={"default"} 
+              disabled={isAdded} 
+              onClick={() => {
+                const newItems = isAdded  ? value.filter(id => id !== service.id) : [...value, service.id];                
+                onValueChange(newItems);
+              }}
+            >
+                {isAdded ? "Selected" : "+ Add"}
+            </Button>
           </div>
         </div>
       </HoverCardContent>

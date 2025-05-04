@@ -31,6 +31,11 @@ export enum EmployeeRole {
   STAFF = "STAFF",
 }
 
+export enum ResourceType {
+  PRODUCT = "PRODUCT",
+  SERVICE = "SERVICE",
+}
+
 export interface Product {
   id: number
   name: string
@@ -82,6 +87,27 @@ export interface Provider {
   name: string
   phone: string
   email: string
+}
+
+export interface Contract {
+  id: number
+  clientId: number
+  eventId: number
+  createdAt: Date
+}
+
+export interface ContractItem {
+  id: number
+  contractId: number
+  resourceId: number
+  type: ResourceType
+}
+
+export interface ContractModifications {
+  id: number
+  contractId: number
+  description: string
+  modifiedAt: Date
 }
 
 

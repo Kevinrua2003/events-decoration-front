@@ -10,27 +10,28 @@ import { getServices } from '@/api/services/main';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Swal from 'sweetalert2';
 import ServiceItem from '@/components/service-item';
+import ContractedResources from '@/components/contracted-resources';
 
 
 
-function ProductsContainer({products}: {products: Product[]}){
+function ProductsContainer({products, value, onValueChange}: {products: Product[], value: number[], onValueChange: (item: number[]) => void}){
   return (
     <ScrollArea className='h-[calc(110vh-200px)] w-full rounded-md border p-1'>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
         {products.map(item => (
-          <ProductCard key={item.id} product={item}/>
+          <ProductCard value={value} onValueChange={onValueChange} key={item.id} product={item}/>
         ))}
       </div>
     </ScrollArea>
   )
 }
 
-function ServicesContainer({services}: {services: Service[]}){
+function ServicesContainer({services, value, onValueChange}: {services: Service[], value: number[], onValueChange: (value: number[]) => void}){
   return (
     <ScrollArea className='h-[calc(110vh-200px)] w-full rounded-md border p-1'>
       <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-4 w-full">
         {services.map(item => (
-          <ServiceItem key={item.id} service={item}/>
+          <ServiceItem value={value} onValueChange={onValueChange} key={item.id} service={item}/>
         ))}
       </div>
     </ScrollArea>
@@ -41,6 +42,9 @@ function ResourcesPage() {
   const eventId = useParams()
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  const [selectedServices, setselectedServices] = useState<number[]>([]);
+
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -71,15 +75,18 @@ function ResourcesPage() {
             <TabsTrigger value="services">Services</TabsTrigger>
           </TabsList>
           <TabsContent value="products" className="mt-1">
-            <ProductsContainer products={products}/>
+            <ProductsContainer value={selectedProducts} onValueChange={setSelectedProducts} products={products}/>
           </TabsContent>
           <TabsContent value="services" className="mt-4">
-            <ServicesContainer services={services}/>
+            <ServicesContainer value={selectedServices} onValueChange={setselectedServices} services={services}/>
           </TabsContent>
         </Tabs>
       </div>      
       <div className='lg:w-96 xl:w-[420px] sticky top-6 h-fit'>
-        <ClientData/>
+        <ClientData eventId={Number(eventId.eventId)} productIds={selectedProducts} serviceIds={selectedServices}/>
+        <ContractedResources products={products.filter((prod) => selectedProducts.find((p) => p === prod.id))} 
+                             services={services.filter((serv) => selectedServices.find((s) => s === serv.id))}
+        />
       </div>
     </div>
   )
