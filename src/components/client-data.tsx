@@ -37,11 +37,11 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
 
   const validateFields = (name: string, lastname: string, email: string, phone: string) => {
     const newErrors = {
-      name: !name.trim() ? 'Nombre requerido' : '',
-      lastname: !lastname.trim() ? 'Apellido requerido' : '',
-      email: !email.trim() ? 'Email requerido' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Email inválido' : '',
-      phone: !phone.trim() ? 'Teléfono requerido' : !/^\+?\d{7,15}$/.test(phone) ? 'Teléfono inválido' : '',
-      resources: (productIds.length === 0 && serviceIds.length === 0) ? 'Debe seleccionar al menos un recurso' : ''
+      name: !name.trim() ? 'Name required' : '',
+      lastname: !lastname.trim() ? 'Last name required' : '',
+      email: !email.trim() ? 'Email required' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Invalid email' : '',
+      phone: !phone.trim() ? 'Phone required' : !/^\+?\d{7,15}$/.test(phone) ? 'Invalid phone' : '',
+      resources: (productIds.length === 0 && serviceIds.length === 0) ? 'Must select at least a product or service' : ''
     }
     
     setErrors(newErrors)
@@ -59,39 +59,36 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
     }
   
     try {
-      // Primero se intenta obtener el cliente. Si no existe, se crea.
       let client: Client;
       try {
         client = await getClientByEmail(email);
-        console.log("Cliente encontrado:", client);
+        console.log("Client found:", client);
       } catch (error: any) {
-        console.warn("Cliente no encontrado, creando uno nuevo.");
+        console.warn("Client not found, creating new one");
         client = await createClient({
-          id: 0, // Suponiendo que el backend asigna el ID
+          id: 0, 
           firstName: name,
           lastName: lastname,
           email,
           phone,
         });
-        console.log("Cliente creado:", client);
+        console.log("Client created:", client);
       }
   
-      // Verificar si ya existe un contrato para el evento y este cliente.
       const contracts = await getContracts();
       const exists = contracts.some((cont) => cont.eventId === eventId && cont.clientId === client.id);
   
-      // Función auxiliar para crear contrato y notificar la operación.
       const createAndNotifyContract = async (client: Client) => {
         const contract: Contract = {
-          id: 0, // Se omite el id para que el backend asigne el valor correcto
+          id: 0, 
           clientId: client.id,
           eventId,
           createdAt: new Date(),
         };
         await createContract(contract);
         Swal.fire({
-          title: 'Operación exitosa',
-          text: 'El contrato ha sido creado con éxito.',
+          title: 'Successful operation',
+          text: 'Contract has been created.',
           icon: 'success',
           confirmButtonText: 'Aceptar',
           confirmButtonColor: '#000',
@@ -100,9 +97,8 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
       };
   
       if (exists) {
-        // Se pregunta al usuario si desea crear un nuevo contrato en caso de existir uno.
         const selection = await Swal.fire({
-          title: '¿Crear nuevo contrato?',
+          title: '¿Create new contract?',
           html: `El cliente ya tiene un contrato para este evento.<br>¿Desea crear otro?`,
           icon: 'warning',
           showCancelButton: true,

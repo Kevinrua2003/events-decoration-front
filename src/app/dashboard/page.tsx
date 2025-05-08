@@ -124,7 +124,7 @@ import { Button } from '@/components/ui/button';
                         type='button'
                         title='Event details'
                         className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => router.push(`/dashboard/resources/${event.id}`)}
+                        onClick={() => Swal.fire("Implement")}
                       >
                         <EyeIcon className="h-4 w-4"/>
                       </button>
