@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 export async function getClients(): Promise<Client[]> {
     
     try {
-        const response = await axios.get(`${process.env.BACKEND}/clients`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/clients`);
         return response.data;
     } catch (error) {
         console.error("Error fetching clients:", error);
@@ -16,7 +16,7 @@ export async function getClients(): Promise<Client[]> {
 
 export async function getClientByEmail(email: string): Promise<Client> {
     try {
-      const response = await axios.get(`${process.env.BACKEND}/clients/email/${email}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/clients/email/${email}`);
 
       if (!response.data || Object.keys(response.data).length === 0) {
         throw new Error('Client not found');
@@ -32,7 +32,7 @@ export async function getClientByEmail(email: string): Promise<Client> {
 export async function createClient(client: Client): Promise<Client> {
     try {
         const { id, ...clientData } = client;
-        const response = await axios.post(`${process.env.BACKEND}/clients`, clientData);
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/clients`, clientData);
         return response.data;
     } catch (error) {
         console.error("Error creating client:", error);
@@ -42,7 +42,7 @@ export async function createClient(client: Client): Promise<Client> {
 
 export async function deleteClient(id: number): Promise<Client> {
     try {
-        const response = await axios.delete(`${process.env.BACKEND}/clients/${id}`);
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/clients/${id}`);
         return response.data;
     } catch (error) {
         console.error("Error deleting client:", error);
@@ -53,7 +53,7 @@ export async function deleteClient(id: number): Promise<Client> {
 export async function modifyClient(id: number, client: Client): Promise<Client> {
     try {
         const {id, ...newClient} = client;
-        const response = await axios.patch(`${process.env.BACKEND}/clients/${id}`, newClient);
+        const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/clients/${id}`, newClient);
         return response.data;
     } catch (error) {
         console.error("Error deleting client:", error);
