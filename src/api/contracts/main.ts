@@ -24,6 +24,7 @@ export async function createContract(contract: Contract): Promise<Contract> {
 }
 
 export async function deleteContract(id: number): Promise<Contract> {
+    
     try {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/contracts/${id}`);
         return response.data;
