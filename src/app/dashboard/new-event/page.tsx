@@ -57,7 +57,7 @@ function CreateEvent() {
       });
     }
 
-    if (isNaN(parseInt(cant, 10))) {
+    if (isNaN(parseInt(cant, 10)) || parseInt(cant, 10) <= 0) {
       return Swal.fire({
         title: "Invalid quantity",
         text: "Guests quantity must be a valid number greater than 0",
