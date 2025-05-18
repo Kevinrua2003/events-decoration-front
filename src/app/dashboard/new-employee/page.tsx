@@ -97,6 +97,8 @@ function CreateEmployee() {
     };
     
     createEmployee(employee);
+
+    router.push(`../dashboard/employees`);
     
     Swal.fire({
       title: "Employee Created!",
@@ -104,9 +106,7 @@ function CreateEmployee() {
       icon: "success",
       confirmButtonColor: "black",
       iconColor: "black",
-    });
-
-    router.push(`../dashboard/employees`);
+    });    
   }
 
   return (

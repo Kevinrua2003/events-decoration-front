@@ -5,9 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Employee } from '@/lib/types'
-import axios from 'axios'
-import { set } from 'date-fns'
-import { DeleteIcon, EyeIcon, PackagePlusIcon, Search, SearchIcon, UserPlus2Icon } from 'lucide-react'
+import { DeleteIcon, PencilIcon, SearchIcon, UserPlus2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 import Swal from 'sweetalert2'
@@ -53,7 +51,7 @@ function page() {
 
       if (result.isConfirmed) {
         await deleteEmployee(id);
-        Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+        Swal.fire('Deleted!', 'Employee has been deleted.', 'success');
         setEmployees(prev => prev.filter(event => event.id !== id));
       }
     }
@@ -108,7 +106,7 @@ function page() {
                     <div className='flex gap-2 justify-center'>
                       <button 
                         type='button'
-                        title='Delete event'
+                        title='Delete employee'
                         className='p-1 rounded-md hover:bg-gray-100 transition-colors'
                         onClick={onDelete(employee.id)}
                       >
@@ -116,19 +114,11 @@ function page() {
                       </button>
                       <button 
                         type='button'
-                        title='Event details'
+                        title='Update employee data'
                         className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => router.push(`/dashboard/resources/${employee.id}`)}
+                        onClick={() => router.push(``)}
                       >
-                        <EyeIcon className="h-4 w-4"/>
-                      </button>
-                      <button 
-                        type='button'
-                        title='Add resources to event'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => router.push(`/dashboard/resources/${employee.id}`)}
-                      >
-                        <PackagePlusIcon className="h-4 w-4"/>
+                        <PencilIcon className="h-4 w-4"/>
                       </button>
                     </div>
                   </TableCell>
