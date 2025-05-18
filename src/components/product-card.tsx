@@ -1,20 +1,28 @@
-import Image from "next/image"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Product } from "@/lib/types"
-import { Button } from "./ui/button"
-import { PlusIcon } from "lucide-react"
-import Swal from "sweetalert2"
-import { useState } from "react"
+import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Product } from "@/lib/types";
+import { Button } from "./ui/button";
+import { PlusIcon } from "lucide-react";
+import Swal from "sweetalert2";
+import { useState } from "react";
 
 interface ProductCardProps {
-  product: Product
-  value: number[]
-  onValueChange: (item: number[]) => void
+  product: Product;
+  value: number[];
+  onValueChange: (item: number[]) => void;
 }
 
-export function ProductCard({ product, value, onValueChange }: ProductCardProps) {
-
+export function ProductCard({
+  product,
+  value,
+  onValueChange,
+}: ProductCardProps) {
   const isAdded = value.includes(product.id);
 
   return (
@@ -24,29 +32,49 @@ export function ProductCard({ product, value, onValueChange }: ProductCardProps)
           src={product.image || "/placeholder.svg?height=128&width=256"}
           alt={product.name}
           fill
+          onClick={() =>
+            Swal.fire({
+              showConfirmButton: false,
+              showCancelButton: false,
+              showCloseButton: true,
+              html: `
+                <div class="flex justify-center items-center">
+                  <img
+                    src="${product.image || "/placeholder.svg?height=128&width=256"}"
+                    alt="${product.name}"
+                    class="object-cover rounded"
+                  />
+                </div>
+              `,
+            })           
+          }
           className="object-cover rounded"
           priority
         />
       </div>
       <CardContent className="p-2 pt-0 text-xs text-gray-600">
         <h3 className="font-semibold text-base line-clamp-1">{product.name}</h3>
-        <p>Provider: <span className="font-medium">{product.providerId}</span></p>
+        <p>
+          Provider: <span className="font-medium">{product.providerId}</span>
+        </p>
       </CardContent>
       <CardFooter className="p-2 pt-0 flex justify-between items-center">
         <Badge className="text-sm" variant="secondary">
           ${product.price.toFixed(2)}
         </Badge>
-        <Button 
-        variant={"default"} 
-        disabled={isAdded} 
-        onClick={() => {
-          const newItems = isAdded ? value.filter(id => id !== product.id) : [...value, product.id];          
-          onValueChange(newItems);
-        }}
+        <Button
+          variant={"default"}
+          onClick={() => {
+            const newItems = isAdded
+              ? value.filter((id) => id !== product.id)
+              : [...value, product.id];
+            onValueChange(newItems);
+          }}
+          className={isAdded ? "bg-red-500 text-white hover:bg-red-800" : ""}
         >
-          {isAdded ? "Selected" : "+ Add"}
+          {isAdded ? "- Remove" : "+ Add"}
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

@@ -45,10 +45,16 @@ function ServiceItem({ service, value, onValueChange }: ServiceItemProps) {
           </div>
 
           <div className="space-y-1 col-span-2 md:col-span-1">
-            <p className="text-xs font-semibold text-gray-500 uppercase">Description</p>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {service.description}
-            </p>
+            <Button 
+              variant={"default"} 
+              onClick={() => {
+                const newItems = isAdded  ? value.filter(id => id !== service.id) : [...value, service.id];                
+                onValueChange(newItems);
+              }}
+              className={isAdded ? "bg-red-500 text-white hover:bg-red-800" : ""}
+            >
+                {isAdded ? "- Remove" : "+ Add"}
+            </Button>
           </div>
         </div>
       </HoverCardTrigger>
@@ -62,24 +68,6 @@ function ServiceItem({ service, value, onValueChange }: ServiceItemProps) {
         <div className="space-y-2">
           <h4 className="font-semibold text-gray-900">{service.name}</h4>
           <p className="text-sm text-gray-600">{service.description}</p>
-          <div className="flex items-center justify-between pt-2">
-            <span className="text-xs font-medium text-blue-600">
-              ${Number(service.price).toLocaleString()}
-            </span>
-            <span className="text-xs font-mono text-gray-500">
-              Provider: #{service.providerId}
-            </span>
-            <Button 
-              variant={"default"} 
-              disabled={isAdded} 
-              onClick={() => {
-                const newItems = isAdded  ? value.filter(id => id !== service.id) : [...value, service.id];                
-                onValueChange(newItems);
-              }}
-            >
-                {isAdded ? "Selected" : "+ Add"}
-            </Button>
-          </div>
         </div>
       </HoverCardContent>
     </HoverCard>

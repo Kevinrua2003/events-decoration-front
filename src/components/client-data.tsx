@@ -99,11 +99,11 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
       if (exists) {
         const selection = await Swal.fire({
           title: '¿Create new contract?',
-          html: `El cliente ya tiene un contrato para este evento.<br>¿Desea crear otro?`,
+          html: `Client already has a contract for this event.<br>¿Create another?`,
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonText: 'Sí, crear nuevo',
-          cancelButtonText: 'Cancelar',
+          confirmButtonText: 'Create new',
+          cancelButtonText: 'Cancel',
           confirmButtonColor: '#000',
         });
   
@@ -114,10 +114,9 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
         await createAndNotifyContract(client);
       }
     } catch (error: any) {
-      console.error("Error en handleSubmit:", error);
       Swal.fire({
         title: 'Error',
-        text: error instanceof Error ? error.message : 'Ocurrió un error en la operación',
+        text: error instanceof Error ? error.message : 'Error in operation',
         icon: 'error',
         confirmButtonColor: '#000',
       });
@@ -131,14 +130,11 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Información del Cliente</CardTitle>
-          <CardDescription>
-            Completa los datos para crear cliente y contrato
-          </CardDescription>
-        </CardHeader>
+        <div className="text-center font-bold text-xl">
+          Client info
+        </div>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nombre</Label>
@@ -196,7 +192,7 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
             
             <Button 
               type="submit" 
-              className="w-full mt-4"
+              className="w-full mt-1"
               disabled={isSubmitting || (productIds.length === 0 && serviceIds.length === 0)}
             >
               <ContactRoundIcon className="mr-2 h-4 w-4" />

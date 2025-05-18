@@ -1,10 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  env:{
-    BACKEND: 'http://localhost:5000',
-  }
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
+  env: {
+    BACKEND: `${process.env.NEXT_PUBLIC_API_URL}`,
+  },
 };
 
 export default nextConfig;
