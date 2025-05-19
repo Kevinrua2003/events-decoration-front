@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/sidebar"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
-import Swal from "sweetalert2"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card"
 
 const data = [
     {
@@ -48,19 +46,7 @@ const data = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const pathName = usePathname();
-  const router = useRouter();
-  const userName = "User";
-
-  function logout() {
-    router.push("/login")
-    Swal.fire({
-      title: "Logged out!",
-      text: `Good bye ${userName}`,
-      icon: "success",
-      confirmButtonColor: "black",
-      iconColor: "black",
-    });
-  }  
+  const userName = "User"; 
 
   return (
     <Sidebar {...props}>
@@ -75,17 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div className="flex flex-col gap-0.5 leading-none">
                 <span className="font-medium">Wellcome {userName}</span>
               </div>
-        </SidebarMenuButton>
-        <HoverCard>
-          <HoverCardTrigger>
-            <div onClick={() => logout()} className="flex rounded-md border border-red-500 m-2 gap-1 items-center justify-center hover:scale-110 transition-all duration-200 ease-in-out">
-                <LogOutIcon className="text-red-600 m-1"/>
-            </div>
-          </HoverCardTrigger>
-          <HoverCardContent className="w-24">
-             Log out
-          </HoverCardContent>
-        </HoverCard>
+        </SidebarMenuButton>        
       </SidebarHeader>
       <SidebarContent className="gap-1">
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">

@@ -10,7 +10,7 @@ export async function getClients(): Promise<Client[]> {
         return response.data;
     } catch (error) {
         console.error("Error fetching clients:", error);
-        return [];
+        throw error;
     }
 }
 
