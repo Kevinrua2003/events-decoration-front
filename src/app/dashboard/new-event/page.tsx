@@ -31,7 +31,7 @@ function CreateEvent() {
   });
   const router = useRouter();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     const name = (data.get('name') as string).trim();
@@ -107,11 +107,13 @@ function CreateEvent() {
       startDate: dateRange.from.toISOString(),
       endDate: dateRange.to.toISOString(),
       location: location as Location,
-      amount: parseInt(cant, 10)
+      amount: Number(cant)
     };
 
+    let createdEvent: Event;
+
     try {
-      createEvent(event);      
+      createdEvent = await createEvent(event);      
     } catch (error) {
       console.error("Error creating event:", error);
       return Swal.fire({
@@ -139,14 +141,14 @@ function CreateEvent() {
       iconColor: "black",
     });
     
-    router.push(`../dashboard/resources/${1}`);
+    router.push(`../dashboard/resources/${createdEvent.id}`);
   };
 
   return (
     <div className="">
       <form onSubmit={handleSubmit}>
-        <div className="grid gap-4 md:gap-6 m-4 md:m-10 p-4 md:p-5 shadow-xl md:shadow-2xl rounded-xl md:rounded-2xl">
-          <div className="text-center text-2xl md:text-3xl">New Event</div>
+        <div className="grid gap-4 md:gap-2 m-1 md:m-1 p-3 md:p-5 shadow-xl md:shadow-2xl rounded-xl md:rounded-2xl">
+          <div className="text-center text-2xl md:text-2xl">New Event</div>
           <Separator/>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="grid gap-2 md:gap-3">

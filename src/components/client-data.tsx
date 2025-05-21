@@ -2,14 +2,14 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Client, cn, Contract } from "@/lib/types"
+import { Client, cn, Contract, ContractItem, ResourceType } from "@/lib/types"
 import { ContactRoundIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useState } from 'react'
 import Swal from 'sweetalert2'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { getClientByEmail, createClient } from "@/api/clients/main"
-import { getContracts, createContract } from "@/api/contracts/main"
+import { getContracts, createContract, createContractItem } from "@/api/contracts/main"
 
 interface ClientDataProps {
   eventId: number
@@ -85,7 +85,9 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
           eventId,
           createdAt: new Date(),
         };
-        await createContract(contract);
+
+        const createdContract: Contract = await createContract(contract);
+
         Swal.fire({
           title: 'Successful operation',
           text: 'Contract has been created.',
@@ -94,12 +96,34 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
           confirmButtonColor: '#000',
         });
         
+        return createdContract;
       };
+
+      const createContractItems = async (contract: Contract) => {
+        productIds.map(async (id) => {
+          let contractItem: ContractItem = {
+            id: 0,
+            contractId: contract.id,
+            resourceId: id,
+            type: ResourceType.PRODUCT
+          }
+          await createContractItem(contractItem);
+        });
+        serviceIds.map(async (id) => {
+          let contractItem: ContractItem = {
+            id: 0,
+            contractId: contract.id,
+            resourceId: id,
+            type: ResourceType.SERVICE
+          }
+          await createContractItem(contractItem);
+        });
+      }
   
       if (exists) {
         const selection = await Swal.fire({
-          title: '¿Create new contract?',
-          html: `Client already has a contract for this event.<br>¿Create another?`,
+          title: '¿Already have a contract?',
+          html: `Client already has a contract for this event.<br>¿Add resources to existing contract?`,
           icon: 'warning',
           showCancelButton: true,
           confirmButtonText: 'Create new',
@@ -108,10 +132,14 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
         });
   
         if (selection.isConfirmed) {
-          await createAndNotifyContract(client);
+          const createdContract: Contract | undefined = contracts.find((cont) => cont.eventId === eventId && cont.clientId === client.id);
+          if(createdContract){
+            await createContractItems(createdContract);
+          }
         }
       } else {
-        await createAndNotifyContract(client);
+        const createdContract: Contract = await createAndNotifyContract(client);
+        await createContractItems(createdContract);
       }
     } catch (error: any) {
       Swal.fire({

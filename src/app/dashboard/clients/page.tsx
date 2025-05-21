@@ -57,7 +57,7 @@ function Clients() {
   }
 
   return (
-    <div className="m-3 border rounded-2xl shadow-sm md:shadow-xl overflow-hidden">
+    <div className="m-1 border rounded-2xl shadow-sm md:shadow-xl overflow-hidden">
         <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-50px)]">
           <div className="flex w-auto items-center space-x-2 m-2">
             <SearchIcon/>

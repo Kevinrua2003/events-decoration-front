@@ -324,10 +324,10 @@ function Page() {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row gap-3 md:gap-5 m-4 p-5">
+    <div className="flex flex-col lg:flex-row gap-3 md:gap-2 m-1 p-5">
       <Carousel
         opts={{
-          align: "start",
+          align: "start", dragFree: true,
         }}
         orientation="vertical"
         className="w-full max-w-xs self-center"
@@ -347,7 +347,7 @@ function Page() {
                 className="basis-1/3 cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-105"
               >
                 <Card className="rounded-lg shadow transition-shadow duration-300 ease-in-out hover:shadow-lg">
-                  <CardContent className="flex flex-col items-center justify-center p-4 space-y-4">
+                  <CardContent className="flex flex-col items-center justify-center p-1 space-y-4">
                     <span className="text-xl font-semibold">
                       {provider.name}
                     </span>

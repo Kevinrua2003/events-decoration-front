@@ -37,7 +37,7 @@ const data = [
     },
     {
       title: "Contracts",
-      url: "#",
+      url: "/dashboard/contracts",
       icon: ContactRoundIcon,
     },
   ]
@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </span>
         </div>
         {data.map((item) => (
-          <SidebarMenuItem key={item.title} className="flex flex-col-1 p-2 gap-1 m-1">
+          <SidebarMenuItem key={item.title} className="flex flex-col-1 p-2 gap-1 items-center">
             <item.icon className="m-0.5"/>
             <SidebarMenuButton asChild isActive={pathName.endsWith(item.url)}>                          
               <Link href={item.url}>{item.title}</Link>

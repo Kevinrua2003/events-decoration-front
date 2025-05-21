@@ -112,8 +112,8 @@ function CreateEmployee() {
   return (
     <div className="">
       <form onSubmit={handleSubmit}>
-        <div className="grid gap-4 md:gap-6 m-3 p-4 md:p-5 shadow-xl md:shadow-2xl rounded-xl md:rounded-2xl">
-          <div className="text-center text-2xl md:text-3xl">New Employee</div>
+        <div className="grid gap-4 md:gap-2 m-1 p-1 md:p-3 shadow-xl md:shadow-2xl rounded-xl md:rounded-2xl">
+          <div className="text-center text-xl md:text-2xl">New Employee</div>
           <Separator/>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="grid gap-2 md:gap-3">
@@ -134,7 +134,6 @@ function CreateEmployee() {
             </div>                
           </div>
           <div className="grid gap-2 md:gap-3 p-2 md:p-3 rounded-md border-2">
-            <h2 className='text-center text-sm md:text-base'>Occupation</h2>
             <ToggleItemsSelector items={items} value={selectedType} onValueChange={setSelectedType}/>
           </div>
           <Button className="w-full text-sm md:text-base" type="submit">

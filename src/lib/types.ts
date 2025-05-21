@@ -101,6 +101,8 @@ export interface ContractItem {
   contractId: number
   resourceId: number
   type: ResourceType
+  quantity: number
+  price: number
 }
 
 export interface ContractModifications {
