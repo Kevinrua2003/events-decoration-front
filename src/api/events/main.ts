@@ -12,6 +12,17 @@ export async function getEvents(): Promise<Event[]> {
     }
 }
 
+export async function getEvent(eventId: number): Promise<Event> {
+    
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/events/${eventId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching event:", error);
+        throw error;
+    }
+}
+
 export async function createEvent(event: Event): Promise<Event> {
     try {
         const { id, ...eventData } = event;

@@ -14,6 +14,17 @@ export async function getClients(): Promise<Client[]> {
     }
 }
 
+export async function getClient(clientId: number): Promise<Client> {
+    
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/clients/${clientId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching client:", error);
+        throw error;
+    }
+}
+
 export async function getClientByEmail(email: string): Promise<Client> {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/clients/email/${email}`);

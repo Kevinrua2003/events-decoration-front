@@ -1,4 +1,4 @@
-import { Contract, ContractItem } from "@/lib/types";
+import { Contract, ContractItem, ContractModifications } from "@/lib/types";
 import axios from "axios";
 
 export async function getContracts(): Promise<Contract[]> {
@@ -45,6 +45,16 @@ export async function modifyContract(id: number, contract: Contract): Promise<Co
     }
 }
 
+export async function getContractItems(): Promise<ContractItem[]> {
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/contract-items`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching item:", error);
+        throw error;
+    }
+}
+
 export async function createContractItem(contractItem: ContractItem): Promise<Event> {
     try {
         const { id, ...contractItemData } = contractItem;
@@ -52,6 +62,16 @@ export async function createContractItem(contractItem: ContractItem): Promise<Ev
         return response.data;
     } catch (error) {
         console.error("Error creating contract:", error);
+        throw error;
+    }
+}
+
+export async function getContractModifications(): Promise<ContractModifications[]> {
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/contract-modifications`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching modifications:", error);
         throw error;
     }
 }
