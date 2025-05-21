@@ -11,10 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { getClientByEmail, createClient } from "@/api/clients/main"
 import { getContracts, createContract, createContractItem } from "@/api/contracts/main"
 
+export interface ContractedProduct {prodId: number, quantity: number, price: number};
+export interface ContractedService {servId: number, quantity: number, price: number};
+
 interface ClientDataProps {
   eventId: number
-  productIds: number[]
-  serviceIds: number[]
+  productIds: ContractedProduct[]
+  serviceIds: ContractedService[]
 }
 
 function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
@@ -100,21 +103,25 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
       };
 
       const createContractItems = async (contract: Contract) => {
-        productIds.map(async (id) => {
+        productIds.map(async (prod) => {
           let contractItem: ContractItem = {
             id: 0,
             contractId: contract.id,
-            resourceId: id,
-            type: ResourceType.PRODUCT
+            resourceId: prod.prodId,
+            type: ResourceType.PRODUCT,
+            quantity: prod.quantity,
+            price: prod.price * prod.quantity
           }
           await createContractItem(contractItem);
         });
-        serviceIds.map(async (id) => {
+        serviceIds.map(async (serv) => {
           let contractItem: ContractItem = {
             id: 0,
             contractId: contract.id,
-            resourceId: id,
-            type: ResourceType.SERVICE
+            resourceId: serv.servId,
+            type: ResourceType.SERVICE,
+            quantity: serv.quantity,
+            price: serv.price
           }
           await createContractItem(contractItem);
         });

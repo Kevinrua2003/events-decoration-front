@@ -4,16 +4,17 @@ import { PlusIcon } from 'lucide-react';
 import React, { useState } from 'react'
 import Swal from 'sweetalert2';
 import { Button } from './ui/button';
+import { ContractedService } from './client-data';
 
 interface ServiceItemProps {
     service: Service
-    value: number[]
-    onValueChange: (items: number[]) => void
+    value: ContractedService[]
+    onValueChange: (items: ContractedService[]) => void
 }
 
 function ServiceItem({ service, value, onValueChange }: ServiceItemProps) {
 
-  const isAdded = value.includes(service.id);
+  const isAdded = value.some(item => item.servId === service.id);
 
   return (
     <HoverCard openDelay={300} closeDelay={200}>
@@ -48,7 +49,7 @@ function ServiceItem({ service, value, onValueChange }: ServiceItemProps) {
             <Button 
               variant={"default"} 
               onClick={() => {
-                const newItems = isAdded  ? value.filter(id => id !== service.id) : [...value, service.id];                
+                const newItems = isAdded  ? value.filter(item => item.servId !== service.id) : [...value, {servId: service.id, quantity: 1, price: service.price}];                
                 onValueChange(newItems);
               }}
               className={isAdded ? "bg-red-500 text-white hover:bg-red-800" : ""}

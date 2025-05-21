@@ -7,13 +7,20 @@ import { Button } from './ui/button';
 import { Sumana } from 'next/font/google';
 
 interface ContractedResourcesProps {
-    products: Product[]
-    services: Service[]
+  products: ContractedResourceItem[];
+  services: ContractedResourceItem[];
+}
+
+export interface ContractedResourceItem {
+  id: number;  
+  name: string;
+  price: number;
+  quantity: number;
 }
 
 function ContractedResources({products, services} : ContractedResourcesProps) {
 
-  const total = products.reduce((acc, prod) => acc + prod.price, 0) + services.reduce((acc, serv) => acc + Number(serv.price), 0);
+  const total = products.reduce((acc, prod) => acc + (prod.price * prod.quantity), 0) + services.reduce((acc, serv) => acc + Number(serv.price), 0);
 
   return (
     <div>
@@ -25,7 +32,7 @@ function ContractedResources({products, services} : ContractedResourcesProps) {
                 <TableHeader>
                     <TableRow>
                         <TableHead className='text-left'>CONTRACTED</TableHead>
-                        <TableHead className='text-center'>RESOURCE TYPE</TableHead>
+                        <TableHead className='text-center'>QUANTITY</TableHead>
                         <TableHead className='text-right'>PRICE</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -33,15 +40,15 @@ function ContractedResources({products, services} : ContractedResourcesProps) {
                     {products.map((prod) => (
                         <TableRow key={`product-${prod.id}`}>
                             <TableCell className=" text-left">{prod.name.substring(0,20) + `${prod.name.length > 20 ? "..." : ""}`}</TableCell>
-                            <TableCell className='text-center'>{ResourceType.PRODUCT}</TableCell>
-                            <TableCell className="text-right">${prod.price.toFixed(2)}</TableCell>
+                            <TableCell className="text-center">{Number(prod.quantity)}</TableCell>
+                            <TableCell className="text-right">${Number(prod.price).toFixed(2)}</TableCell>
                         </TableRow>
                         ))}
 
                     {services.map((serv) => (
                         <TableRow key={`service-${serv.id}`}>
                             <TableCell className="text-left">{serv.name.substring(0,20) + `${serv.name.length > 20 ? "..." : ""}`}</TableCell>
-                            <TableCell className='text-center'>{ResourceType.SERVICE}</TableCell>
+                            <TableCell className="text-center">{Number(serv.quantity)}</TableCell>
                             <TableCell className="text-right">${Number(serv.price).toFixed(2)}</TableCell>
                         </TableRow>
                         ))}

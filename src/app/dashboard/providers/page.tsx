@@ -77,9 +77,11 @@ function Page() {
     const result = await Swal.fire({
       title: "Create Provider",
       html: `
-        <input type="text" id="swal-input-name" name="name" class="swal2-input" placeholder="Name"/>
-        <input type="text" id="swal-input-phone" name="phone" class="swal2-input" placeholder="Phone"/>
-        <input type="text" id="swal-input-email" name="email" class="swal2-input" placeholder="Email"/>
+        <div class="border border-black rounded-sm p-2">
+          <input type="text" id="swal-input-name" name="name" class="swal2-input" placeholder="Name"/>
+          <input type="text" id="swal-input-phone" name="phone" class="swal2-input" placeholder="Phone"/>
+          <input type="text" id="swal-input-email" name="email" class="swal2-input" placeholder="Email"/>
+        </div>        
       `,
       focusConfirm: false,
       showCancelButton: true,
