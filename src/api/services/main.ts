@@ -4,10 +4,20 @@ import axios from "axios";
 export async function getServices(): Promise<Service[]> {
     try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/services`);
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Error fetching services:", error);
         return [];
+    }
+}
+
+export async function getService(servId: number): Promise<Service> {
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/services/${servId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching service:", error);
+        throw error;
     }
 }
 
