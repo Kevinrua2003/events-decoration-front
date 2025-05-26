@@ -1,6 +1,6 @@
 'use client'
 import * as React from "react"
-import { ContactRoundIcon, HandIcon, LogOutIcon, PersonStandingIcon, SignalIcon, UserCircle, UsersIcon } from "lucide-react"
+import { ContactRoundIcon, HandIcon, LayoutDashboardIcon, LogOutIcon, PersonStandingIcon, SignalIcon, UserCircle, UsersIcon } from "lucide-react"
 
 import {
   Sidebar,
@@ -13,11 +13,12 @@ import {
 } from "@/components/ui/sidebar"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
+import Span from "./Span"
 
 const data = [
     {
       title: "Events Gestion",
-      url: "/dashboard",
+      url: "/dashboard/events",
       icon: SignalIcon,
     },
     {
@@ -64,11 +65,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>        
       </SidebarHeader>
       <SidebarContent className="gap-1">
-        <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-            <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                Administration
-            </span>
-        </div>
+        <SidebarMenuItem key={"Dashboard"} className="flex flex-col-1 p-2 gap-1 items-center">
+            <LayoutDashboardIcon className="m-0.5"/>
+            <SidebarMenuButton asChild isActive={pathName.endsWith("/dashboard")}>                          
+              <Link href={"/dashboard"}>{"Main stats"}</Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        <Span text={"Administration"} font={"sm"}/>
         {data.map((item) => (
           <SidebarMenuItem key={item.title} className="flex flex-col-1 p-2 gap-1 items-center">
             <item.icon className="m-0.5"/>
