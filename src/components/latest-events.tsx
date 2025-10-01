@@ -1,10 +1,8 @@
 'use client'
 import { getEvents } from '@/api/events/main';
 import { Event, EventType } from '@/lib/types';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { Skeleton } from './ui/skeleton';
-import { LucideBriefcaseBusiness, LucideIcon, MoonStarIcon, PartyPopperIcon, SearchSlashIcon } from 'lucide-react';
+import { LucideBriefcaseBusiness, MoonStarIcon, PartyPopperIcon, SearchSlashIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 const eventTypeIcons = [
@@ -31,7 +29,7 @@ function LatestEventItem({ event }: { event: Event }) {
 
     return (
         <div className="flex items-center gap-4 p-4 m-0.5 bg-white rounded-lg shadow-md border border-gray-200">
-            {item && <item.icon className="w-6 h-6" />} {/* Ícono con tamaño y color */}
+            {item && <item.icon className="w-6 h-6" />}
             <div className="flex flex-col">
                 <span className="text-lg font-semibold text-gray-800">{event.name.substring(0,30).concat(`${event.name.length >= 30 ? "..." : ""}`)}</span> {/* Nombre del evento */}
                 <span className="text-sm text-gray-500">Personas: {event.amount}</span> {/* Cantidad de asistentes */}
@@ -60,7 +58,7 @@ function LatestEvents() {
     <div className='flex flex-nowrap overflow-x-scroll lg:overflow-x-hidden justify-around'>
         {events.map((event) => {
             return (
-                <div key={event.id}>
+                <div key={event.id} className=''>
                     <LatestEventItem event={event}/>
                 </div>
             )

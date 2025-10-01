@@ -12,20 +12,35 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Swal from 'sweetalert2'
 import { useRouter } from "next/navigation"
-import { FormEvent } from "react"
+import { FormEvent, useState } from "react"
+import { signIn } from "next-auth/react"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
 
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const data = new FormData(e.currentTarget);
     const email = data.get('email') as string;
     const pass = data.get('password') as string;
+
+    const res = await signIn("credentials", {
+      redirect: false,
+      username: email,
+      password: pass,
+      callbackUrl: "/dashboard",
+    });
+
+    if (res?.error) {
+      Swal.fire("User or password incorrect");
+      return;
+    }
 
     Swal.fire({
       title: "Logged In!",
@@ -35,7 +50,7 @@ export function LoginForm({
       iconColor: "black",
     });
 
-    router.push("/dashboard");
+    router.push(res?.url || "/dashboard"); 
   };
 
   return (
@@ -78,8 +93,8 @@ export function LoginForm({
                   </div>
                   <Input id="password" type="password" name="password" required />
                 </div>
-                <Button className="w-full" type="submit">
-                  Login
+                <Button className="w-full" disabled={loading} type="submit">
+                  {loading ? "...Please Wait": "Login"}
                 </Button>
               </div>
             </div>

@@ -79,7 +79,7 @@ function page() {
                 <TableHead className="hidden md:table-cell text-center">Email</TableHead>
                 <TableHead className="hidden lg:table-cell text-center">Phone</TableHead>
                 <TableHead className="text-center">Ocupation</TableHead>               
-                <TableHead className="text-center">Credentials</TableHead>
+                <TableHead className="text-center">Alias</TableHead>
                 <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -99,8 +99,7 @@ function page() {
                     {employee.role}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-center">
-                    User: {employee.username} <br/>
-                    Password: {employee.password}
+                    User: {employee.username}
                   </TableCell>
                   <TableCell className="text-center">
                     <div className='flex gap-2 justify-center'>
@@ -116,7 +115,7 @@ function page() {
                         type='button'
                         title='Update employee data'
                         className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => router.push(``)}
+                        onClick={() => Swal.fire("IMPLEMENTAR")}
                       >
                         <PencilIcon className="h-4 w-4"/>
                       </button>

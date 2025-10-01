@@ -15,7 +15,7 @@ export async function getEmployees(): Promise<Employee[]> {
 export async function createEmployee(employee: Employee): Promise<Event> {
     try {
         const { id, ...employeeData } = employee;
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/employees`, employeeData);
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, employeeData);
         return response.data;
     } catch (error) {
         console.error("Error creating employee:", error);

@@ -24,6 +24,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { BellIcon, LogOutIcon } from "lucide-react";
 import { Noto_Emoji } from "next/font/google";
+import { signOut } from "next-auth/react";
 
 export default function DashboardLayout({
   children,
@@ -55,7 +56,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <AppSidebar className="hidden md:block" />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b">
+        <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b">
           <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -86,7 +87,7 @@ export default function DashboardLayout({
             <HoverCard>
               <HoverCardTrigger>
                 <div
-                  onClick={() => logout()}
+                  onClick={async () => await signOut()}
                   className="flex rounded-md border border-red-500 m-5 gap-1 items-center justify-center hover:scale-110 hover:text-white hover:bg-red-300 hover:cursor-pointer transition-all duration-200 ease-in-out"
                 >
                   <div className="flex flex-row m-1 items-center">

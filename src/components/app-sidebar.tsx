@@ -1,47 +1,46 @@
 'use client'
 import * as React from "react"
-import { ContactRoundIcon, HandIcon, LayoutDashboardIcon, LogOutIcon, PersonStandingIcon, SignalIcon, UserCircle, UsersIcon } from "lucide-react"
+import { CalendarIcon, FileText, HandshakeIcon, LayoutDashboardIcon, UserCircle, UserCircleIcon, UsersIcon } from "lucide-react"
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import Span from "./Span"
 
 const data = [
-    {
-      title: "Events Gestion",
-      url: "/dashboard/events",
-      icon: SignalIcon,
-    },
-    {
-      title: "Our Providers",
-      url: "/dashboard/providers",
-      icon: HandIcon,
-    },
-    {
-      title: "Our Employees",
-      url: "/dashboard/employees",
-      icon: UsersIcon,
-    },
-    {
-      title: "Our Clients",
-      url: "/dashboard/clients",
-      icon: PersonStandingIcon,
-    },
-    {
-      title: "Contracts",
-      url: "/dashboard/contracts",
-      icon: ContactRoundIcon,
-    },
-  ]
+  {
+    title: "Events Gestion",
+    url: "/dashboard/events",
+    icon: CalendarIcon, 
+  },
+  {
+    title: "Providers",
+    url: "/dashboard/providers",
+    icon: HandshakeIcon,
+  },
+  {
+    title: "Employees",
+    url: "/dashboard/employees",
+    icon: UsersIcon, 
+  },
+  {
+    title: "Clients",
+    url: "/dashboard/clients",
+    icon: UserCircleIcon,
+  },
+  {
+    title: "Contracts",
+    url: "/dashboard/contracts",
+    icon: FileText,
+  },
+];
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

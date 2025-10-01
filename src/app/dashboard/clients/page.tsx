@@ -102,7 +102,7 @@ function Clients() {
                         type='button'
                         title='Update client data'
                         className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => router.push(``)}
+                        onClick={() => Swal.fire("IMPLEMENTAR")}
                       >
                         <PencilIcon className="h-4 w-4"/>
                       </button>
