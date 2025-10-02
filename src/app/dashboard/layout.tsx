@@ -87,7 +87,10 @@ export default function DashboardLayout({
             <HoverCard>
               <HoverCardTrigger>
                 <div
-                  onClick={async () => await signOut()}
+                  onClick={async () => 
+                    // await signOut()         2
+                    logout()    //             3
+                  }
                   className="flex rounded-md border border-red-500 m-5 gap-1 items-center justify-center hover:scale-110 hover:text-white hover:bg-red-300 hover:cursor-pointer transition-all duration-200 ease-in-out"
                 >
                   <div className="flex flex-row m-1 items-center">

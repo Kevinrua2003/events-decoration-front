@@ -25,32 +25,34 @@ export function LoginForm({
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    const data = new FormData(e.currentTarget);
-    const email = data.get('email') as string;
-    const pass = data.get('password') as string;
+    // setLoading(true);                                       4
+    // const data = new FormData(e.currentTarget);
+    // const email = data.get('email') as string;
+    // const pass = data.get('password') as string;
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      username: email,
-      password: pass,
-      callbackUrl: "/dashboard",
-    });
+    // const res = await signIn("credentials", {
+    //   redirect: false,
+    //   username: email,
+    //   password: pass,
+    //   callbackUrl: "/dashboard",
+    // });
 
-    if (res?.error) {
-      Swal.fire("User or password incorrect");
-      return;
-    }
+    // if (res?.error) {
+    //   Swal.fire("User or password incorrect");
+    //   return;
+    // }
 
-    Swal.fire({
-      title: "Logged In!",
-      text: `You are now logged in email: ${email} password: ${pass}!`,
-      icon: "success",
-      confirmButtonColor: "black",
-      iconColor: "black",
-    });
+    // Swal.fire({
+    //   title: "Logged In!",
+    //   text: `You are now logged in email: ${email} password: ${pass}!`,
+    //   icon: "success",
+    //   confirmButtonColor: "black",
+    //   iconColor: "black",
+    // });
 
-    router.push(res?.url || "/dashboard"); 
+    router.push(
+      // res?.url ||                          5
+      "/dashboard"); 
   };
 
   return (
