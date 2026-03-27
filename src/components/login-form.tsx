@@ -25,23 +25,23 @@ export function LoginForm({
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);                                        
-    const data = new FormData(e.currentTarget);
-    const email = data.get('email') as string;
-    const pass = data.get('password') as string;
+    // setLoading(true);                                        
+    // const data = new FormData(e.currentTarget);
+    // const email = data.get('email') as string;
+    // const pass = data.get('password') as string;
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      username: email,
-      password: pass,
-      callbackUrl: "/dashboard",
-    });
+    // const res = await signIn("credentials", {
+    //   redirect: false,
+    //   username: email,
+    //   password: pass,
+    //   callbackUrl: "/dashboard",
+    // });
 
-    if (res?.error) {
-      Swal.fire("Error", "Usuario o contraseña incorrectos", "error");
-      setLoading(false);
-      return;
-    }
+    // if (res?.error) {
+    //   Swal.fire("Error", "Usuario o contraseña incorrectos", "error");
+    //   setLoading(false);
+    //   return;
+    // }
 
     router.push("/dashboard"); 
   };
