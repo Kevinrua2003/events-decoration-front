@@ -6,18 +6,18 @@ import React from 'react'
 
 function Page() {
   return (
-    <div className="container mx-auto p-1">
-      <div className="mb-2 shadow rounded-md p-4">
-        <Span text={'Latest Events'} font={'xl'}/>
+    <div className="space-y-6">
+      <div className="minimal-card p-6">
+        <Span text={'Eventos Recientes'} font={'lg'}/>
         <LatestEvents />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="border border-slate-200 shadow rounded-md p-4">
-          <Span text={'Best contracts made'} font={'md'}/>
+        <div className="minimal-card p-6">
+          <Span text={'Contratos Destacados'} font={'md'}/>
           <BestContracts />
         </div>
-        <div className="border border-slate-200 shadow rounded-md p-4">
-          <Span text={'Events type per month'} font={'md'}/>
+        <div className="minimal-card p-6">
+          <Span text={'Eventos por Mes'} font={'md'}/>
           <EventsChart />
         </div>
       </div>

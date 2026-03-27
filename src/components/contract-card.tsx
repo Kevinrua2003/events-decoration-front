@@ -4,7 +4,6 @@ import {
   Card,
   CardHeader,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,13 +22,12 @@ import {
 import { Badge } from "./ui/badge";
 import { Skeleton } from "./ui/skeleton";
 import { SheetViewer } from "./sheet-generic-viewer";
-import { Label } from "./ui/label";
 import ResourceListItem from "./resource-list-item";
 
 const formatDate = (date: Date) =>
-  new Date(date).toLocaleDateString("en-EN", {
+  new Date(date).toLocaleDateString("es-ES", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
   });
 
@@ -39,9 +37,7 @@ interface ContractCardProps {
 
 const ContractCard: React.FC<ContractCardProps> = ({ contract }) => {
   const [items, setItems] = useState<ContractItem[]>([]);
-  const [modifications, setModifications] = useState<ContractModifications[]>(
-    []
-  );
+  const [modifications, setModifications] = useState<ContractModifications[]>([]);
   const [client, setClient] = useState<Client | null>(null);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(false);
@@ -60,9 +56,7 @@ const ContractCard: React.FC<ContractCardProps> = ({ contract }) => {
         setClient(clientData);
         setEvent(eventData);
         setItems(allItems.filter((item) => item.contractId === contract.id));
-        setModifications(
-          allMods.filter((mod) => mod.contractId === contract.id)
-        );
+        setModifications(allMods.filter((mod) => mod.contractId === contract.id));
       } catch (error) {
         console.error("Error fetching contract data:", error);
       } finally {
@@ -70,89 +64,90 @@ const ContractCard: React.FC<ContractCardProps> = ({ contract }) => {
       }
     }
     fetchData();
-  }, []);
+  }, [contract.id, contract.clientId, contract.eventId]);
 
   return (
-    <Card className="mb-4 shadow-lg transition-transform hover:scale-105">
-      <CardHeader className="bg-gray-200 p-4">
-        <h2 className="text-xl font-bold">Contrato #{contract.id}</h2>
-        <p>
-          Client:{" "}
-          {client
-            ? client.firstName + " " + client.lastName
-            : contract.clientId}
+    <Card className="minimal-card hover:border-primary/30 transition-colors">
+      <CardHeader className="pb-3 border-b border-border">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-semibold text-lg">Contrato #{contract.id}</h3>
+            <p className="text-sm text-muted-foreground">
+              {client ? `${client.firstName} ${client.lastName}` : `Cliente #${contract.clientId}`}
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {formatDate(contract.createdAt)}
+          </span>
+        </div>
+        <p className="text-sm text-muted-foreground mt-1">
+          Evento: {event ? event.name : `#${contract.eventId}`}
         </p>
-        <p>Event: {event ? event.name : contract.eventId}</p>
-        <p>Created: {formatDate(contract.createdAt)}</p>
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="pt-4">
         {loading ? (
           <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px] bg-slate-200" />
-            <Skeleton className="h-4 w-[200px] bg-slate-200" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
           </div>
         ) : (
-          <>
-            <Badge className="bg-slate-500 ml-1">
-              Contract has {modifications.length} modifications
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Badge variant="secondary">
+              {items.length} recurso{items.length !== 1 ? 's' : ''}
             </Badge>
-            <Badge className="bg-slate-500 ml-1">
-              {items.length} resources has been contracted
-            </Badge>
-          </>
+            {modifications.length > 0 && (
+              <Badge variant="outline">
+                {modifications.length} modificacion{modifications.length !== 1 ? 'es' : ''}
+              </Badge>
+            )}
+          </div>
         )}
         <SheetViewer
           trigger={
-            <Button
-              variant="default"
-              disabled={loading}
-              className="m-2 px-4 py-2 transition-colors ease-in-out disabled:opacity-50 text-white rounded shadow"
-            >
-              {loading ? "...Please wait" : "Show details"}
+            <Button variant="outline" size="sm" className="w-full" disabled={loading}>
+              {loading ? "Cargando..." : "Ver detalles"}
             </Button>
           }
-          title={
-            <></>
-          }
+          title={<></>}
           body={
             <div className="space-y-6">
               <div>
-                <Label className="block text-center text-lg font-semibold text-gray-700">
-                  Modifications
-                </Label>
-                <section className="flex flex-col bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm mt-2">
+                <h4 className="font-medium mb-3">Modificaciones</h4>
+                <div className="bg-muted/50 p-4 rounded-lg border border-border">
                   {modifications.length === 0 ? (
-                    <p className="text-gray-500 italic">
-                      No modifications have been made to this contract
+                    <p className="text-sm text-muted-foreground italic">
+                      Sin modificaciones
                     </p>
                   ) : (
-                    modifications.map((mod) => (
-                      <div
-                        key={mod.id}
-                        className="p-2 hover:bg-gray-100 transition-colors rounded"
-                      >
-                        {mod.description}
-                      </div>
-                    ))
+                    <div className="space-y-2">
+                      {modifications.map((mod) => (
+                        <div
+                          key={mod.id}
+                          className="p-2 text-sm hover:bg-muted rounded transition-colors"
+                        >
+                          {mod.description}
+                        </div>
+                      ))}
+                    </div>
                   )}
-                </section>
+                </div>
               </div>
 
               <div>
-                <Label className="block text-center text-lg font-semibold text-gray-700">
-                  Contracted
-                </Label>
-                <section className="flex flex-col bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm mt-2">
+                <h4 className="font-medium mb-3">Recursos Contratados</h4>
+                <div className="bg-muted/50 p-4 rounded-lg border border-border">
                   {items.length === 0 ? (
-                    <p className="text-gray-500 italic">
-                      There are no contracted resources right now
+                    <p className="text-sm text-muted-foreground italic">
+                      Sin recursos contratados
                     </p>
                   ) : (
-                    items.map((item) => (
-                      <ResourceListItem item={item} key={item.id} />
-                    ))
+                    <div className="space-y-2">
+                      {items.map((item) => (
+                        <ResourceListItem item={item} key={item.id} />
+                      ))}
+                    </div>
                   )}
-                </section>
+                </div>
               </div>
             </div>
           }

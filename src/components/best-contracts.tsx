@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { format } from "date-fns";
 
 interface Props {
   contractId: number;
@@ -23,6 +22,7 @@ interface Props {
 
 function BestContracts() {
   const [listItems, setListItems] = useState<Props[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchItems() {
@@ -54,8 +54,8 @@ function BestContracts() {
             contractId: contract.id,
             clientName: client
               ? `${client.firstName} ${client.lastName}`
-              : "not found",
-            eventName: event ? event.name : "not found",
+              : "Sin cliente",
+            eventName: event ? event.name : "Sin evento",
             money: amount,
           };
         });
@@ -64,6 +64,8 @@ function BestContracts() {
         setListItems(sorted.slice(0, 10));
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -71,30 +73,38 @@ function BestContracts() {
   }, []);
 
   return (
-    <Table className="w-full">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-left">Event</TableHead>
-          <TableHead className="text-center">Client</TableHead>
-          <TableHead className="text-center">Earned</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody className="">
-        {listItems.map((item) => (
-          <TableRow key={item.contractId}>
-            <TableCell className="font-medium text-left truncate max-w-[180px]">
-              {item.eventName}
-            </TableCell>
-            <TableCell className="hidden md:table-cell text-center">
-              {item.clientName}
-            </TableCell>
-            <TableCell className="hidden lg:table-cell text-center">
-              ${item.money}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div>
+      {loading ? (
+        <div className="p-4 text-center text-muted-foreground">Cargando...</div>
+      ) : listItems.length === 0 ? (
+        <div className="p-4 text-center text-muted-foreground">No hay contratos</div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead>Evento</TableHead>
+              <TableHead className="hidden md:table-cell text-center">Cliente</TableHead>
+              <TableHead className="text-right">Monto</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {listItems.map((item) => (
+              <TableRow key={item.contractId} className="hover:bg-muted/50">
+                <TableCell className="font-medium truncate max-w-[150px]">
+                  {item.eventName}
+                </TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground">
+                  {item.clientName}
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  ${item.money.toLocaleString()}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }
 

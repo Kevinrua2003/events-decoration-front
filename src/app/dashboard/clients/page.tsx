@@ -3,24 +3,26 @@
 import { deleteClient, getClients } from '@/api/clients/main'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Client, Employee } from '@/lib/types'
-import { DeleteIcon, PencilIcon, SearchIcon, UserPlus2Icon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import React, { useEffect } from 'react'
+import { Client } from '@/lib/types'
+import { DeleteIcon, PencilIcon, SearchIcon } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
+import Span from '@/components/Span'
 
 function Clients() {
 
-  const router = useRouter();
-  const [clients, setClients] = React.useState<Client[]>([]);
-  const  [data, setData] = React.useState<Client[]>([]);
-  const [search, setSearch] = React.useState<string>('');
+  const [clients, setClients] = useState<Client[]>([]);
+  const [data, setData] = useState<Client[]>([]);
+  const [search, setSearch] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchClients = async () => {
+      setLoading(true);
       const response = await getClients();
       setData(response);
       setClients(response);
+      setLoading(false);
     };
     fetchClients();
   }, []);
@@ -35,76 +37,90 @@ function Clients() {
       setClients(aux);
     };
     filterClients();
-  }, [search]);
+  }, [search, data]);
 
   function onDelete(id: number) {
     return async () => {
       const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esto",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
       });
 
       if (result.isConfirmed) {
         await deleteClient(id);
-        Swal.fire('Deleted!', 'Client has been deleted.', 'success');
-        setClients(prev => prev.filter(event => event.id !== id));
+        Swal.fire('Eliminado', 'El cliente ha sido eliminado', 'success');
+        setClients(prev => prev.filter(client => client.id !== id));
       }
     }
   }
 
   return (
-    <div className="m-1 border rounded-2xl shadow-sm md:shadow-xl overflow-hidden">
-        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-50px)]">
-          <div className="flex w-auto items-center space-x-2 m-2">
-            <SearchIcon/>
-            <Input 
-              type="text" 
-              placeholder="Search clients by email or name"
-              onKeyUp={e => setSearch(e.currentTarget.value)}
-              />
-          </div>          
-          <Table className="min-w-[800px] md:w-full">
+    <div className="minimal-card">
+      <div className="p-4 border-b border-border">
+        <div className="relative max-w-md">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input 
+            type="text" 
+            placeholder="Buscar clientes por nombre o email..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+      
+      {loading ? (
+        <div className="p-8 text-center text-muted-foreground">
+          Cargando...
+        </div>
+      ) : clients.length === 0 ? (
+        <div className="p-8 text-center text-muted-foreground">
+          No hay clientes para mostrar
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[180px] text-left">Complete name</TableHead>
-                <TableHead className="hidden md:table-cell text-center">Email</TableHead>
-                <TableHead className="hidden lg:table-cell text-center">Phone</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-[200px]">Nombre</TableHead>
+                <TableHead className="hidden md:table-cell">Email</TableHead>
+                <TableHead className="hidden lg:table-cell">Teléfono</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {clients.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell className="font-medium text-left truncate max-w-[180px]">
-                    {client.firstName + ' ' + client.lastName}
+                <TableRow key={client.id} className="hover:bg-muted/50">
+                  <TableCell className="font-medium">
+                    {client.firstName} {client.lastName}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-center">
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
                     {client.email}
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-center">
+                  <TableCell className="hidden lg:table-cell text-muted-foreground">
                     {client.phone}
                   </TableCell>
-                  <TableCell className="text-center">
-                    <div className='flex gap-2 justify-center'>
+                  <TableCell className="text-right">
+                    <div className='flex gap-1 justify-end'>
                       <button 
                         type='button'
-                        title='Delete client'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={onDelete(client.id)}
+                        title='Editar'
+                        className='p-2 rounded-md hover:bg-muted transition-colors'
+                        onClick={() => Swal.fire("IMPLEMENTAR")}
                       >
-                        <DeleteIcon className="h-4 w-4"/>
+                        <PencilIcon className="h-4 w-4 text-muted-foreground"/>
                       </button>
                       <button 
                         type='button'
-                        title='Update client data'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => Swal.fire("IMPLEMENTAR")}
+                        title='Eliminar'
+                        className='p-2 rounded-md hover:bg-muted transition-colors'
+                        onClick={onDelete(client.id)}
                       >
-                        <PencilIcon className="h-4 w-4"/>
+                        <DeleteIcon className="h-4 w-4 text-muted-foreground hover:text-destructive"/>
                       </button>
                     </div>
                   </TableCell>
@@ -113,7 +129,8 @@ function Clients() {
             </TableBody>
           </Table>
         </div>
-      </div>
+      )}
+    </div>
   )
 }
 

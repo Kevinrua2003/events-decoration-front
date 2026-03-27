@@ -6,7 +6,6 @@ import {
     TableCell,
     TableHead,
     TableHeader,
-    TableFooter,
     TableRow,
   } from "@/components/ui/table"  
 import { format } from 'date-fns';
@@ -17,6 +16,7 @@ import { Event } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Span from '@/components/Span';
 
   function EventsPage() {
 
@@ -24,12 +24,15 @@ import { Button } from '@/components/ui/button';
     const [events, setEvents] = useState<Event[]>([]);
     const [data, setData] = useState<Event[]>([]);
     const [search, setSearch] = useState<string>('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
       const fetchEvents = async () => {
+        setLoading(true);
         const response = await getEvents();
         setData(response);
         setEvents(response);
+        setLoading(false);
       }
       fetchEvents();
     }, []);
@@ -43,111 +46,128 @@ import { Button } from '@/components/ui/button';
         setEvents(aux);
       };
       filterEvents();
-    }, [search]);
+    }, [search, data]);
 
     function onDelete(id: number) {
       return async () => {
         const result = await Swal.fire({
-          title: 'Are you sure?',
-          text: "You won't be able to revert this!",
+          title: '¿Estás seguro?',
+          text: "No podrás revertir esto",
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonText: 'Yes, delete it!',
-          cancelButtonText: 'No, cancel!',
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar',
         });
 
         if (result.isConfirmed) {
           await deleteEvent(id);
-          Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+          Swal.fire('Eliminado', 'El evento ha sido eliminado', 'success');
           setEvents(prev => prev.filter(event => event.id !== id));
         }
       }
     }
 
     return (
-      <div className="m-3 border rounded-2xl shadow-sm md:shadow-xl overflow-hidden">
-        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-50px)]">
-          <div className="flex w-auto items-center space-x-2 m-2">
-            <SearchIcon/>
-            <Input 
-              type="text" 
-              placeholder="Search events by name"
-              onKeyUp={e => setSearch(e.currentTarget.value)}
+      <div className="minimal-card">
+        <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                type="text" 
+                placeholder="Buscar eventos..."
+                className="pl-9 w-full sm:w-64"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
-            <Button variant='default' onClick={() => router.push('/dashboard/new-event')}>
-              <UserPlus2Icon/>
-              <span className="text-sm">Add new event</span>
-            </Button>
-          </div>  
-          <Table className="min-w-[800px] md:w-full">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[180px] text-left">Event</TableHead>
-                <TableHead className="hidden md:table-cell text-center">Type</TableHead>
-                <TableHead className="hidden lg:table-cell text-center">Location</TableHead>
-                <TableHead className="text-center">Start Date</TableHead>
-                <TableHead className="hidden sm:table-cell text-center">End Date</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
-                <TableHead className="text-right">Guests</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className=''>
-              {events.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium text-left truncate max-w-[180px]">
-                    {event.name}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell text-center">
-                    <span className="hidden sm:inline">{event.type}</span>
-                    <span className="sm:hidden">{event.type.toString().slice(0,3)}</span>
-                  </TableCell>
-                  <TableCell className="hidden lg:table-cell text-center">
-                    {event.location}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {format(event.startDate, "MMM dd")}
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell text-center">
-                    {format(event.endDate, "MMM dd")}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className='flex gap-2 justify-center'>
-                      <button 
-                        type='button'
-                        title='Delete event'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={onDelete(event.id)}
-                      >
-                        <DeleteIcon className="h-4 w-4"/>
-                      </button>
-                      <button 
-                        type='button'
-                        title='Event details'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => Swal.fire("Implement")}
-                      >
-                        <EyeIcon className="h-4 w-4"/>
-                      </button>
-                      <button 
-                        type='button'
-                        title='Add resources to event'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => router.push(`/dashboard/resources/${event.id}`)}
-                      >
-                        <PackagePlusIcon className="h-4 w-4"/>
-                      </button>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className='flex items-center justify-end gap-2'>
-                      {event.amount}<PersonStandingIcon />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            </div>
+          </div>
+          <Button onClick={() => router.push('/dashboard/new-event')} className="minimal-button">
+            <UserPlus2Icon className="h-4 w-4 mr-2" />
+            Nuevo Evento
+          </Button>
         </div>
+        
+        {loading ? (
+          <div className="p-8 text-center text-muted-foreground">
+            Cargando...
+          </div>
+        ) : events.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">
+            No hay eventos para mostrar
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[180px]">Evento</TableHead>
+                  <TableHead className="hidden md:table-cell text-center">Tipo</TableHead>
+                  <TableHead className="hidden lg:table-cell text-center">Ubicación</TableHead>
+                  <TableHead className="text-center">Inicio</TableHead>
+                  <TableHead className="hidden sm:table-cell text-center">Fin</TableHead>
+                  <TableHead className="text-center">Invitados</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {events.map((event) => (
+                  <TableRow key={event.id} className="hover:bg-muted/50">
+                    <TableCell className="font-medium truncate max-w-[180px]">
+                      {event.name}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell text-center">
+                      {event.type}
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-center text-muted-foreground">
+                      {event.location}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {format(event.startDate, "dd MMM")}
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-center text-muted-foreground">
+                      {format(event.endDate, "dd MMM")}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        {event.amount}
+                        <PersonStandingIcon className="h-3 w-3 text-muted-foreground" />
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className='flex gap-1 justify-end'>
+                        <button 
+                          type='button'
+                          title='Ver detalles'
+                          className='p-2 rounded-md hover:bg-muted transition-colors'
+                          onClick={() => Swal.fire("Implementar")}
+                        >
+                          <EyeIcon className="h-4 w-4 text-muted-foreground"/>
+                        </button>
+                        <button 
+                          type='button'
+                          title='Agregar recursos'
+                          className='p-2 rounded-md hover:bg-muted transition-colors'
+                          onClick={() => router.push(`/dashboard/resources/${event.id}`)}
+                        >
+                          <PackagePlusIcon className="h-4 w-4 text-muted-foreground"/>
+                        </button>
+                        <button 
+                          type='button'
+                          title='Eliminar'
+                          className='p-2 rounded-md hover:bg-muted transition-colors'
+                          onClick={onDelete(event.id)}
+                        >
+                          <DeleteIcon className="h-4 w-4 text-muted-foreground hover:text-destructive"/>
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
     )
   }

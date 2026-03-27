@@ -7,21 +7,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Employee } from '@/lib/types'
 import { DeleteIcon, PencilIcon, SearchIcon, UserPlus2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 
 function page() {
 
   const router = useRouter();
-  const [employees, setEmployees] = React.useState<Employee[]>([]);
-  const  [data, setData] = React.useState<Employee[]>([]);
-  const [search, setSearch] = React.useState<string>('');
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [data, setData] = useState<Employee[]>([]);
+  const [search, setSearch] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEmployees = async () => {
+      setLoading(true);
       const response = await getEmployees();
       setData(response);
       setEmployees(response);
+      setLoading(false);
     };
     fetchEmployees();
   }, []);
@@ -36,110 +39,112 @@ function page() {
       setEmployees(aux);
     };
     filterEmployees();
-  }, [search]);
+  }, [search, data]);
 
   function onDelete(id: number) {
     return async () => {
       const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esto",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
       });
 
       if (result.isConfirmed) {
         await deleteEmployee(id);
-        Swal.fire('Deleted!', 'Employee has been deleted.', 'success');
-        setEmployees(prev => prev.filter(event => event.id !== id));
+        Swal.fire('Eliminado', 'Empleado eliminado', 'success');
+        setEmployees(prev => prev.filter(employee => employee.id !== id));
       }
     }
   }
 
   return (
-    <div className="m-1 border rounded-2xl shadow-sm md:shadow-xl overflow-hidden">
-        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-50px)]">
-          <div className="flex w-auto items-center space-x-2 m-2">
-            <SearchIcon/>
+    <div className="minimal-card">
+      <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               type="text" 
-              placeholder="Search employees by email or name"
-              onKeyUp={e => setSearch(e.currentTarget.value)}
-              />
-            <Button onClick={() => router.push("new-employee")} variant='default'>
-            <UserPlus2Icon/>
-            <span className="text-sm">Add new employee</span>
-          </Button>
-          </div>          
-          <Table className="min-w-[800px] md:w-full">
+              placeholder="Buscar empleados..."
+              className="pl-9 w-full sm:w-64"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+        <Button onClick={() => router.push("new-employee")}>
+          <UserPlus2Icon className="h-4 w-4 mr-2" />
+          Nuevo Empleado
+        </Button>
+      </div>
+      
+      {loading ? (
+        <div className="p-8 text-center text-muted-foreground">
+          Cargando...
+        </div>
+      ) : employees.length === 0 ? (
+        <div className="p-8 text-center text-muted-foreground">
+          No hay empleados para mostrar
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[180px] text-left">Complete name</TableHead>
-                <TableHead className="hidden md:table-cell text-center">Email</TableHead>
-                <TableHead className="hidden lg:table-cell text-center">Phone</TableHead>
-                <TableHead className="text-center">Ocupation</TableHead>               
-                <TableHead className="text-center">Alias</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-[200px]">Nombre</TableHead>
+                <TableHead className="hidden md:table-cell">Email</TableHead>
+                <TableHead className="hidden lg:table-cell">Teléfono</TableHead>
+                <TableHead className="text-center">Rol</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {employees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell className="font-medium text-left truncate max-w-[180px]">
-                    {employee.firstName + ' ' + employee.lastName}
+                <TableRow key={employee.id} className="hover:bg-muted/50">
+                  <TableCell className="font-medium">
+                    {employee.firstName} {employee.lastName}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-center">
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
                     {employee.email}
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-center">
+                  <TableCell className="hidden lg:table-cell text-muted-foreground">
                     {employee.phone}
                   </TableCell>
                   <TableCell className="text-center">
-                    {employee.role}
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted">
+                      {employee.role}
+                    </span>
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell text-center">
-                    User: {employee.username}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className='flex gap-2 justify-center'>
+                  <TableCell className="text-right">
+                    <div className='flex gap-1 justify-end'>
                       <button 
                         type='button'
-                        title='Delete employee'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={onDelete(employee.id)}
+                        title='Editar'
+                        className='p-2 rounded-md hover:bg-muted transition-colors'
+                        onClick={() => Swal.fire("IMPLEMENTAR")}
                       >
-                        <DeleteIcon className="h-4 w-4"/>
+                        <PencilIcon className="h-4 w-4 text-muted-foreground"/>
                       </button>
                       <button 
                         type='button'
-                        title='Update employee data'
-                        className='p-1 rounded-md hover:bg-gray-100 transition-colors'
-                        onClick={() => Swal.fire("IMPLEMENTAR")}
+                        title='Eliminar'
+                        className='p-2 rounded-md hover:bg-muted transition-colors'
+                        onClick={onDelete(employee.id)}
                       >
-                        <PencilIcon className="h-4 w-4"/>
+                        <DeleteIcon className="h-4 w-4 text-muted-foreground hover:text-destructive"/>
                       </button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
-            {/* <TableFooter>
-              <TableRow>
-                <TableCell colSpan={6} className="text-lg hidden md:table-cell">
-                  Total
-                </TableCell>
-                <TableCell colSpan={2} className="text-lg md:hidden">
-                  Total
-                </TableCell>
-                <TableCell className="text-right">
-                  ${events.reduce((sum, item) => sum + item.amount, 0)}
-                </TableCell>
-              </TableRow>
-            </TableFooter> */}
           </Table>
         </div>
-      </div>
+      )}
+    </div>
   )
 }
 

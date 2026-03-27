@@ -1,13 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Product, Provider, ResourceType, Service } from "@/lib/types";
 import {
   createProvider,
@@ -18,9 +11,7 @@ import { createService, deleteService, getServices } from "@/api/services/main";
 import { createProduct, deleteProduct, getProducts } from "@/api/products/main";
 import { Button } from "@/components/ui/button";
 import {
-  Delete,
   DeleteIcon,
-  LucideDelete,
   PencilIcon,
   PlusCircleIcon,
 } from "lucide-react";
@@ -34,27 +25,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useRouter } from "next/navigation";
 
 function Page() {
   const [providers, setProviders] = useState<Provider[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState<number>(-1);
+  const [selectedProvider, setSelectedProvider] = useState<number | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchProviders() {
+      setLoading(true);
       const data = await getProviders();
       setProviders(data);
+      setLoading(false);
     }
     fetchProviders();
   }, []);
 
   useEffect(() => {
     async function fetchResources() {
-      if (selectedProvider === -1) {
+      if (selectedProvider === null) {
         setProducts([]);
         setServices([]);
         return;
@@ -75,19 +66,18 @@ function Page() {
 
   const handleCreateProvider = async () => {
     const result = await Swal.fire({
-      title: "Create Provider",
+      title: "Crear Proveedor",
       html: `
-        <div class="border border-black rounded-sm p-2">
-          <input type="text" id="swal-input-name" name="name" class="swal2-input" placeholder="Name"/>
-          <input type="text" id="swal-input-phone" name="phone" class="swal2-input" placeholder="Phone"/>
-          <input type="text" id="swal-input-email" name="email" class="swal2-input" placeholder="Email"/>
+        <div class="flex flex-col gap-3">
+          <input type="text" id="swal-input-name" class="swal2-input" placeholder="Nombre"/>
+          <input type="text" id="swal-input-phone" class="swal2-input" placeholder="Teléfono"/>
+          <input type="text" id="swal-input-email" class="swal2-input" placeholder="Email"/>
         </div>        
       `,
       focusConfirm: false,
       showCancelButton: true,
-      cancelButtonText: "Cancel",
-      cancelButtonColor: "black",
-      confirmButtonText: "Create",
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Crear",
       preConfirm: () => {
         const name = (
           document.getElementById("swal-input-name") as HTMLInputElement
@@ -99,24 +89,9 @@ function Page() {
           document.getElementById("swal-input-email") as HTMLInputElement
         )?.value;
         if (!name || !phone || !email) {
-          Swal.showValidationMessage("Please complete all fields.");
+          Swal.showValidationMessage("Por favor completa todos los campos.");
           return;
         }
-        if (name.length < 3) {
-          Swal.showValidationMessage("Name must be at least 3 characters.");
-          return;
-        }
-        const phoneRegex = /^[0-9]{8,}$/;
-        if (!phoneRegex.test(phone)) {
-          Swal.showValidationMessage("Phone not valid. Length must be 8");
-          return;
-        }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          Swal.showValidationMessage("Email not valid.");
-          return;
-        }
-
         return { name, phone, email };
       },
     });
@@ -130,105 +105,68 @@ function Page() {
         email,
       };
       await createProvider(newProvider);
-      Swal.fire("Created", "Now we have a new provider", "success");
+      Swal.fire("Creado", "Nuevo proveedor creado", "success");
       setProviders([...providers, newProvider]);
     }
   };
 
   const handleDeleteProvider = async (id: number) => {
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this. Resources from this provider will be removed from system once all events that use them are finished",
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esto",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
     });
     if (result.isConfirmed) {
       await deleteProvider(id);
-      Swal.fire("Deleted!", `Provider has been deleted.`, "success");
+      Swal.fire("Eliminado", "Proveedor eliminado", "success");
+      setProviders(providers.filter((prov) => prov.id !== id));
+      if (selectedProvider === id) {
+        setSelectedProvider(null);
+      }
     }
-    setProviders(providers.filter((prov) => prov.id !== id));
   };
 
   const handleCreateResource = async (providerId: number) => {
     const result = await Swal.fire({
-      title: "Create resource",
+      title: "Crear Recurso",
       html: `
-      <div class="border border-black rounded-sm p-2">
-        <div class="flex justify-center mb-2">
-          <label class="mr-4">
-            <input type="radio" name="resourceType" value="product" checked> Product
+      <div class="flex flex-col gap-3">
+        <div class="flex justify-center gap-4 mb-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="resourceType" value="product" checked> Producto
           </label>
-          <label>
-            <input type="radio" name="resourceType" value="service"> Service
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="resourceType" value="service"> Servicio
           </label>
         </div>
-        <input type="text" id="swal-input-name" class="swal2-input" placeholder="Name">
-        <input type="number" id="swal-input-price" class="swal2-input" placeholder="Price">
-      
-        <div id="resource-product">
-          <input type="text" id="swal-input-image" class="swal2-input" placeholder="Image URL">
-        </div>
-      
-        <div id="resource-service" style="display: none;">
-          <textarea id="swal-input-description" class="swal2-textarea" placeholder="Service description"></textarea>
-        </div>
+        <input type="text" id="swal-input-name" class="swal2-input" placeholder="Nombre">
+        <input type="number" id="swal-input-price" class="swal2-input" placeholder="Precio">
+        <input type="text" id="swal-input-image" class="swal2-input" placeholder="URL de imagen (solo productos)">
+        <textarea id="swal-input-description" class="swal2-textarea" placeholder="Descripción (solo servicios)"></textarea>
       </div>
     `,
       focusConfirm: false,
       showCancelButton: true,
-      cancelButtonText: "Cancel",
-      confirmButtonText: "Create",
-      confirmButtonColor: "black",
-      cancelButtonColor: "red",
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Crear",
       preConfirm: () => {
-        const errors: string[] = [];
-
         const resourceType = (
           document.querySelector(
             'input[name="resourceType"]:checked'
           ) as HTMLInputElement
         )?.value;
-        if (!resourceType) {
-          errors.push("Select a resource type.");
-        }
         const name = (
           document.getElementById("swal-input-name") as HTMLInputElement
         )?.value.trim();
-        if (!name) {
-          errors.push("Resource needs a name.");
-        }
         const price = (
           document.getElementById("swal-input-price") as HTMLInputElement
         )?.value.trim();
-        if (!price || isNaN(Number(price))) {
-          errors.push("There must be a price, and it must be numeric.");
-        }
-        if (resourceType === "product") {
-          const image = (
-            document.getElementById("swal-input-image") as HTMLInputElement
-          )?.value.trim();
-          if (!image) {
-            errors.push("Product image needs an URL.");
-          }
-        } else if (resourceType === "service") {
-          const description = (
-            document.getElementById(
-              "swal-input-description"
-            ) as HTMLTextAreaElement
-          )?.value.trim();
-          if (!description) {
-            errors.push("There must be a description for the service.");
-          }
-        }
-
-        if (errors.length > 0) {
-          Swal.showValidationMessage(
-            `<ul class="text-left">${errors
-              .map((error) => `<li>${error}</li>`)
-              .join("")}</ul>`
-          );
+        
+        if (!name || !price) {
+          Swal.showValidationMessage("El nombre y precio son requeridos.");
           return;
         }
 
@@ -246,31 +184,6 @@ function Page() {
           return { resourceType, name, price, description };
         }
       },
-      didOpen: () => {
-        const radioButtons = document.querySelectorAll(
-          'input[name="resourceType"]'
-        );
-        radioButtons.forEach((radio) => {
-          radio.addEventListener("change", (e) => {
-            const selected = (e.target as HTMLInputElement).value;
-            if (selected === "product") {
-              (
-                document.getElementById("resource-product") as HTMLElement
-              ).style.display = "block";
-              (
-                document.getElementById("resource-service") as HTMLElement
-              ).style.display = "none";
-            } else {
-              (
-                document.getElementById("resource-product") as HTMLElement
-              ).style.display = "none";
-              (
-                document.getElementById("resource-service") as HTMLElement
-              ).style.display = "block";
-            }
-          });
-        });
-      },
     });
 
     if (result.isConfirmed && result.value) {
@@ -280,7 +193,7 @@ function Page() {
             id: 0,
             name: result.value.name,
             price: Number(result.value.price),
-            image: result.value.image,
+            image: result.value.image || '',
             providerId: providerId,
           };
           await createProduct(prod);
@@ -290,15 +203,15 @@ function Page() {
             id: 0,
             name: result.value.name,
             price: Number(result.value.price),
-            description: result.value.description,
+            description: result.value.description || '',
             providerId: providerId,
           };
           await createService(serv);
           setServices([...services, serv]);
         }
-        Swal.fire("Created", `Resource has been created`, "success");
+        Swal.fire("Creado", "Recurso creado exitosamente", "success");
       } catch (error) {
-        Swal.fire("Error", `There was an error creating resource: ${error}`, "error");
+        Swal.fire("Error", `Error al crear recurso: ${error}`, "error");
       }
     }
   };
@@ -306,177 +219,153 @@ function Page() {
   const onDeleteResource = useCallback(
     (id: number, isProduct: boolean) => async () => {
       const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: "¿Estás seguro?",
+        text: "No podrás revertir esto",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "No, cancel!",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
       });
       if (result.isConfirmed) {
         isProduct ? await deleteProduct(id) : await deleteService(id);
-        Swal.fire(
-          "Deleted!",
-          `${isProduct ? "Product" : "Service"} has been deleted.`,
-          "success"
-        );
+        if (isProduct) {
+          setProducts(products.filter(p => p.id !== id));
+        } else {
+          setServices(services.filter(s => s.id !== id));
+        }
+        Swal.fire("Eliminado", "Recurso eliminado", "success");
       }
     },
-    []
+    [products, services]
   );
 
   return (
-    <div className="flex flex-col lg:flex-row gap-3 md:gap-2 m-1 p-5">
-      <Carousel
-        opts={{
-          align: "start", dragFree: true,
-        }}
-        orientation="vertical"
-        className="w-full max-w-xs self-center"
-      >
-        <CarouselContent className="-mt-1 h-[calc(85vh-50px)]">
-          {providers.length === 0 ? (
-            <div className="flex items-center justify-center p-4">
-              <span className="text-lg font-semibold">
-                No providers to show
-              </span>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-1">
+        <div className="minimal-card p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium">Proveedores</h3>
+            <Button size="sm" onClick={handleCreateProvider}>
+              <PlusCircleIcon className="h-4 w-4 mr-1" />
+              Nuevo
+            </Button>
+          </div>
+          
+          {loading ? (
+            <div className="p-8 text-center text-muted-foreground">
+              Cargando...
+            </div>
+          ) : providers.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              No hay proveedores
             </div>
           ) : (
-            providers.map((provider) => (
-              <CarouselItem
-                key={provider.id}
-                onClick={() => setSelectedProvider(provider.id)}
-                className="basis-1/3 cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-105"
-              >
-                <Card className="rounded-lg shadow transition-shadow duration-300 ease-in-out hover:shadow-lg">
-                  <CardContent className="flex flex-col items-center justify-center p-1 space-y-4">
-                    <span className="text-xl font-semibold">
-                      {provider.name}
-                    </span>
-                    <div className="flex flex-wrap justify-center gap-1">
-                      <Badge>{provider.phone}</Badge>
-                      <Badge>{provider.email}</Badge>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => handleCreateResource(provider.id)}
-                        size="sm"
-                        className="border border-black hover:bg-green-200"
-                      >
-                        <PlusCircleIcon className="mr-1" /> Resource
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => handleDeleteProvider(provider.id)}
-                        size="sm"
-                        className="border border-black hover:bg-red-300"
-                      >
-                        <DeleteIcon className="mr-1" /> Delete
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))
+            <div className="space-y-2">
+              {providers.map((provider) => (
+                <div
+                  key={provider.id}
+                  onClick={() => setSelectedProvider(provider.id)}
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                    selectedProvider === provider.id
+                      ? 'border-primary bg-muted'
+                      : 'border-border hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{provider.name}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteProvider(provider.id);
+                      }}
+                      className="p-1 rounded hover:bg-muted"
+                    >
+                      <DeleteIcon className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    <Badge variant="secondary" className="text-xs">{provider.phone}</Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
+        </div>
+      </div>
 
-      <div className="flex flex-col w-full shadow lg:p-4 pt-15">
-        <Button className="mb-3" onClick={handleCreateProvider}>
-          <PlusCircleIcon /> New Provider
-        </Button>
-        {products.length + services.length === 0 ? (
-          <div className="h-[calc(70vh-50px)] border border-black rounded-sm content-center text-center">
-            No resources to show
+      <div className="lg:col-span-2">
+        <div className="minimal-card p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium">
+              {selectedProvider 
+                ? `Recursos - ${providers.find(p => p.id === selectedProvider)?.name}`
+                : 'Selecciona un proveedor'}
+            </h3>
+            {selectedProvider && (
+              <Button size="sm" variant="outline" onClick={() => handleCreateResource(selectedProvider)}>
+                <PlusCircleIcon className="h-4 w-4 mr-1" />
+                Agregar
+              </Button>
+            )}
           </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-left">Resource name</TableHead>
-                <TableHead className="text-center hidden md:table-cell">
-                  Price
-                </TableHead>
-                <TableHead className="text-center hidden lg:table-cell">
-                  Type
-                </TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((prod) => (
-                <TableRow key={`product-${prod.id}`}>
-                  <TableCell className="text-left truncate max-w-[180px]">
-                    {prod.name}
-                  </TableCell>
-                  <TableCell className="text-center hidden md:table-cell">
-                    {prod.price}
-                  </TableCell>
-                  <TableCell className="text-center hidden lg:table-cell">
-                    {ResourceType.PRODUCT}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex gap-2 justify-center">
+          
+          {!selectedProvider ? (
+            <div className="p-8 text-center text-muted-foreground">
+              Selecciona un proveedor para ver sus recursos
+            </div>
+          ) : products.length + services.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              No hay recursos para mostrar
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead className="text-center">Precio</TableHead>
+                  <TableHead className="text-center hidden md:table-cell">Tipo</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products.map((prod) => (
+                  <TableRow key={`product-${prod.id}`}>
+                    <TableCell className="font-medium">{prod.name}</TableCell>
+                    <TableCell className="text-center">${prod.price}</TableCell>
+                    <TableCell className="text-center hidden md:table-cell">
+                      <Badge>Producto</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
                       <button
-                        type="button"
-                        title="Delete"
-                        className="p-1 rounded-md hover:bg-gray-100 transition-colors"
                         onClick={onDeleteResource(prod.id, true)}
+                        className="p-2 rounded-md hover:bg-muted transition-colors"
                       >
-                        <DeleteIcon className="h-4 w-4" />
+                        <DeleteIcon className="h-4 w-4 text-muted-foreground" />
                       </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {services.map((serv) => (
+                  <TableRow key={`service-${serv.id}`}>
+                    <TableCell className="font-medium">{serv.name}</TableCell>
+                    <TableCell className="text-center">${serv.price}</TableCell>
+                    <TableCell className="text-center hidden md:table-cell">
+                      <Badge variant="outline">Servicio</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
                       <button
-                        type="button"
-                        title="Edit"
-                        className="p-1 rounded-md hover:bg-gray-100 transition-colors"
-                        onClick={() => router.push(``)}
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {services.map((serv) => (
-                <TableRow key={`service-${serv.id}`}>
-                  <TableCell className="text-left truncate max-w-[180px]">
-                    {serv.name}
-                  </TableCell>
-                  <TableCell className="text-center hidden md:table-cell">
-                    {serv.price}
-                  </TableCell>
-                  <TableCell className="text-center hidden lg:table-cell">
-                    {ResourceType.SERVICE}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        type="button"
-                        title="Delete"
-                        className="p-1 rounded-md hover:bg-gray-100 transition-colors"
                         onClick={onDeleteResource(serv.id, false)}
+                        className="p-2 rounded-md hover:bg-muted transition-colors"
                       >
-                        <DeleteIcon className="h-4 w-4" />
+                        <DeleteIcon className="h-4 w-4 text-muted-foreground" />
                       </button>
-                      <button
-                        type="button"
-                        title="Edit"
-                        className="p-1 rounded-md hover:bg-gray-100 transition-colors"
-                        onClick={() => router.push(``)}
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
       </div>
     </div>
   );

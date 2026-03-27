@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -25,7 +25,7 @@ export function LoginForm({
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);                                       4
+    setLoading(true);                                        
     const data = new FormData(e.currentTarget);
     const email = data.get('email') as string;
     const pass = data.get('password') as string;
@@ -38,17 +38,10 @@ export function LoginForm({
     });
 
     if (res?.error) {
-      Swal.fire("User or password incorrect");
+      Swal.fire("Error", "Usuario o contraseña incorrectos", "error");
+      setLoading(false);
       return;
     }
-
-    Swal.fire({
-      title: "Logged In!",
-      text: `You are now logged in email: ${email} password: ${pass}!`,
-      icon: "success",
-      confirmButtonColor: "black",
-      iconColor: "black",
-    });
 
     router.push("/dashboard"); 
   };
@@ -56,47 +49,35 @@ export function LoginForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+        <CardHeader className="text-center pb-4">
+          <CardTitle>Iniciar sesión</CardTitle>
           <CardDescription>
-            Login with your account
+            Ingresa tus credenciales para continuar
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <div className="grid gap-6">
-              <div className="flex flex-col gap-4">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="correo@ejemplo.com"
+                  required
+                  className="minimal-input"
+                />
               </div>
-              <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                
-              </div>
-              <div className="grid gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    placeholder="m@example.com"
-                    required
-                  />
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Contraseña</Label>
                 </div>
-                <div className="grid gap-3">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                    <a
-                      href="#"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
-                  </div>
-                  <Input id="password" type="password" name="password" required />
-                </div>
-                <Button className="w-full" disabled={loading} type="submit">
-                  {loading ? "...Please Wait": "Login"}
-                </Button>
+                <Input id="password" type="password" name="password" required className="minimal-input" />
               </div>
+              <Button className="w-full minimal-button" disabled={loading} type="submit">
+                {loading ? "Ingresando..." : "Iniciar sesión"}
+              </Button>
             </div>
           </form>
         </CardContent>

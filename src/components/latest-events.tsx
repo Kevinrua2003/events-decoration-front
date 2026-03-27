@@ -8,19 +8,23 @@ import { format } from 'date-fns';
 const eventTypeIcons = [
     {
         type: EventType.BIRTHDAY,
-        icon: PartyPopperIcon
+        icon: PartyPopperIcon,
+        color: 'text-orange-500'
     },
     {
         type: EventType.CORPORATE,
-        icon: LucideBriefcaseBusiness
+        icon: LucideBriefcaseBusiness,
+        color: 'text-blue-500'
     },
     {
         type: EventType.WEDDING,
-        icon: MoonStarIcon
+        icon: MoonStarIcon,
+        color: 'text-pink-500'
     },
     {
         type: EventType.OTHER,
-        icon: SearchSlashIcon
+        icon: SearchSlashIcon,
+        color: 'text-muted-foreground'
     },
 ]
 
@@ -28,12 +32,16 @@ function LatestEventItem({ event }: { event: Event }) {
     const item = eventTypeIcons.find(x => x.type === event.type);
 
     return (
-        <div className="flex items-center gap-4 p-4 m-0.5 bg-white rounded-lg shadow-md border border-gray-200">
-            {item && <item.icon className="w-6 h-6" />}
-            <div className="flex flex-col">
-                <span className="text-lg font-semibold text-gray-800">{event.name.substring(0,30).concat(`${event.name.length >= 30 ? "..." : ""}`)}</span> {/* Nombre del evento */}
-                <span className="text-sm text-gray-500">Personas: {event.amount}</span> {/* Cantidad de asistentes */}
-                <span className="text-sm text-gray-400">{format(event.startDate, 'PP')}</span> {/* Fecha formateada */}
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer min-w-[180px]">
+            {item && (
+                <div className={`p-2 rounded-full bg-muted ${item.color}`}>
+                    <item.icon className="w-4 h-4" />
+                </div>
+            )}
+            <div className="flex flex-col min-w-0">
+                <span className="font-medium text-sm truncate">{event.name}</span>
+                <span className="text-xs text-muted-foreground">{event.amount} personas</span>
+                <span className="text-xs text-muted-foreground">{format(event.startDate, 'dd MMM')}</span>
             </div>
         </div>
     );
@@ -43,6 +51,7 @@ function LatestEventItem({ event }: { event: Event }) {
 function LatestEvents() {
 
     const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchEvents(){            
@@ -50,19 +59,24 @@ function LatestEvents() {
             const sorted = result.sort((x,y) => new Date(y.startDate).getTime() - new Date(x.startDate).getTime());
             const latestEvents: Event[] = sorted.slice(0,5);
             setEvents(latestEvents);
+            setLoading(false);
         }
         fetchEvents();
     }, []);
 
   return (
-    <div className='flex flex-nowrap overflow-x-scroll lg:overflow-x-hidden justify-around'>
-        {events.map((event) => {
-            return (
-                <div key={event.id} className=''>
-                    <LatestEventItem event={event}/>
-                </div>
-            )
-        })}
+    <div>
+        {loading ? (
+            <div className="p-4 text-center text-muted-foreground">Cargando...</div>
+        ) : events.length === 0 ? (
+            <div className="p-4 text-center text-muted-foreground">No hay eventos</div>
+        ) : (
+            <div className='flex gap-3 overflow-x-auto pb-2 -mx-2 px-2'>
+                {events.map((event) => (
+                    <LatestEventItem key={event.id} event={event}/>
+                ))}
+            </div>
+        )}
     </div>
   )
 }

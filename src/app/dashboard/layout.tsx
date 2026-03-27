@@ -21,7 +21,7 @@ import {
 } from "../../components/ui/hover-card";
 import React, { Fragment, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { BellIcon, LogOutIcon } from "lucide-react";
+import { BellIcon, LogOutIcon, UserIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { createinterceptor } from "@/lib/axios";
 
@@ -45,21 +45,23 @@ export default function DashboardLayout({
     <SidebarProvider>
       <AppSidebar className="hidden md:block" />
       <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b">
-          <div className="flex items-center gap-2 px-3">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-4">
+          <div className="flex items-center gap-2">
             <SidebarTrigger />
-            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Separator orientation="vertical" className="h-4" />
             <Breadcrumb className="hidden md:block">
               <BreadcrumbList>
-                <BreadcrumbItem className="md:block">
-                  Events gestion
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/dashboard" className="text-muted-foreground">
+                    Dashboard
+                  </BreadcrumbLink>
                 </BreadcrumbItem>
                 {paths.map((item, index) =>
                   index === 0 || item.length === 1 ? null : (
                     <Fragment key={index}>
-                      <BreadcrumbSeparator className="md:block" />
+                      <BreadcrumbSeparator className="hidden md:block" />
                       <BreadcrumbItem>
-                        <BreadcrumbPage>
+                        <BreadcrumbPage className="text-foreground font-medium">
                           {formatBreadcrumb(item)}
                         </BreadcrumbPage>
                       </BreadcrumbItem>
@@ -69,41 +71,31 @@ export default function DashboardLayout({
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className="flex flex-row items-center content-center">
-            <div className="flex flex-row border rounded-md border-black p-2 hover:bg-black hover:text-white hover:scale-110 hover:cursor-pointer transition-all duration-200 ease-in-out">
-              <BellIcon className="mr-2"/> <div className="flex items-center justify-center h-6 w-3">0</div>
-            </div>
+          <div className="flex items-center gap-3">
+            <button className="p-2 rounded-md hover:bg-muted transition-colors duration-200">
+              <BellIcon className="h-4 w-4 text-muted-foreground" />
+            </button>
             <HoverCard>
               <HoverCardTrigger>
-                <div
-                  onClick={async () => 
-                    await signOut()         
-                  }
-                  className="flex rounded-md border border-red-500 m-5 gap-1 items-center justify-center hover:scale-110 hover:text-white hover:bg-red-300 hover:cursor-pointer transition-all duration-200 ease-in-out"
+                <button 
+                  onClick={async () => await signOut()}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-muted transition-colors duration-200 text-sm text-muted-foreground hover:text-foreground"
                 >
-                  <div className="flex flex-row m-1 items-center">
-                    <LogOutIcon className="text-red-600 m-1" />
-                    Log out
-                  </div>
-                </div>
+                  <LogOutIcon className="h-4 w-4" />
+                  <span className="hidden sm:inline">Salir</span>
+                </button>
               </HoverCardTrigger>
               <HoverCardContent className="w-auto">
-                You will be logged out. Hope you come back
+                Cerrar sesión
               </HoverCardContent>
             </HoverCard>
           </div>
         </header>
-        <div className="flex w-full flex-1 flex-col gap-4 p-4 md:p-4 h-screen">
-          <div className="grid grid-rows-[auto_1fr] gap-4 h-full max-w-screen-2xl mx-auto w-full">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 auto-rows-fr">
-              {React.Children.map(children, (child) => (
-                <div className="flex-1 min-h-[200px] h-full w-full">
-                  {child}
-                </div>
-              ))}
-            </div>
+        <main className="flex flex-1 flex-col gap-4 p-4 md:p-6">
+          <div className="mx-auto w-full max-w-7xl">
+            {children}
           </div>
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
