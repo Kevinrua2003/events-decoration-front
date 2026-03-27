@@ -1,9 +1,9 @@
 import { Service } from "@/lib/types"
-import axios from "axios";
+import api from "@/lib/axios";
 
 export async function getServices(): Promise<Service[]> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/services`);
+        const response = await api.get('/services');
         return response.data;
     } catch (error) {
         console.error("Error fetching services:", error);
@@ -13,7 +13,7 @@ export async function getServices(): Promise<Service[]> {
 
 export async function getService(servId: number): Promise<Service> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/services/${servId}`);
+        const response = await api.get(`/services/${servId}`);
         return response.data;
     } catch (error) {
         console.error("Error fetching service:", error);
@@ -24,7 +24,7 @@ export async function getService(servId: number): Promise<Service> {
 export async function createService(service: Service): Promise<Service> {
     try {
         const { id, ...serviceData } = service;
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/services`, serviceData);
+        const response = await api.post('/services', serviceData);
         return response.data;
     } catch (error) {
         console.error("Error creating service:", error);
@@ -34,7 +34,7 @@ export async function createService(service: Service): Promise<Service> {
 
 export async function deleteService(id: number): Promise<Service> {
     try {
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/services/${id}`);
+        const response = await api.delete(`/services/${id}`);
         return response.data;
     } catch (error) {
         console.error("Error deleting service:", error);

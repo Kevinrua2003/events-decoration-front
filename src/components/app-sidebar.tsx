@@ -13,6 +13,7 @@ import {
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import Span from "./Span"
+import { useSession } from "next-auth/react"
 
 const data = [
   {
@@ -47,6 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const pathName = usePathname();
   const userName = "User"; 
+  const session = useSession();
 
   return (
     <Sidebar {...props}>
@@ -59,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <UserCircle className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-medium">Wellcome {userName}</span>
+                <span className="font-medium">Wellcome {userName}: {session.data?.user.role}</span>
               </div>
         </SidebarMenuButton>        
       </SidebarHeader>

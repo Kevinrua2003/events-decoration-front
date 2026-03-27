@@ -1,9 +1,9 @@
 import { Product } from "@/lib/types"
-import axios from "axios";
+import api from "@/lib/axios";
 
 export async function getProducts(): Promise<Product[]> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`);
+        const response = await api.get('/products');
         return response.data;
     } catch (error) {
         console.error("Error fetching products:", error);
@@ -13,7 +13,7 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function getProduct(prodId: number): Promise<Product> {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/${prodId}`);
+        const response = await api.get(`/products/${prodId}`);
         return response.data;
     } catch (error) {
         console.error("Error fetching product:", error);
@@ -24,7 +24,7 @@ export async function getProduct(prodId: number): Promise<Product> {
 export async function createProduct(product: Product): Promise<Product> {
     try {
         const { id, ...productData } = product;
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/products`, productData);
+        const response = await api.post('/products', productData);
         return response.data;
     } catch (error) {
         console.error("Error creating product:", error);
@@ -34,7 +34,7 @@ export async function createProduct(product: Product): Promise<Product> {
 
 export async function deleteProduct(id: number): Promise<Product> {
     try {
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`);
+        const response = await api.delete(`/products/${id}`);
         return response.data;
     } catch (error) {
         console.error("Error deleting product:", error);

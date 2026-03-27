@@ -19,34 +19,23 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "../../components/ui/hover-card";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Swal from "sweetalert2";
 import { BellIcon, LogOutIcon } from "lucide-react";
-import { Noto_Emoji } from "next/font/google";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { createinterceptor } from "@/lib/axios";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const userName = "user";
   const pathName = usePathname();
-  const paths = pathName.split("/");
+  const paths = pathName.split("/");  
+  const session = useSession();
 
-  function logout() {
-    router.push("/login");
-    Swal.fire({
-      title: "Logged out!",
-      text: `Good bye ${userName}`,
-      icon: "success",
-      confirmButtonColor: "black",
-      iconColor: "black",
-    });
-  }
-
+  createinterceptor(session.data?.backendTokens.accessToken);
+  
   function formatBreadcrumb(item: string): string {
     const formatted = item.replace(/-/g, " ");
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
@@ -88,8 +77,7 @@ export default function DashboardLayout({
               <HoverCardTrigger>
                 <div
                   onClick={async () => 
-                    // await signOut()         2
-                    logout()    //             3
+                    await signOut()         
                   }
                   className="flex rounded-md border border-red-500 m-5 gap-1 items-center justify-center hover:scale-110 hover:text-white hover:bg-red-300 hover:cursor-pointer transition-all duration-200 ease-in-out"
                 >

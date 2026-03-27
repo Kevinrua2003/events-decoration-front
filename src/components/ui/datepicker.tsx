@@ -16,7 +16,7 @@ import {
 export function DatePickerWithRange({
   className,
   date,
-  onDateChange, // Nuevo prop
+  onDateChange, 
 }: React.HTMLAttributes<HTMLDivElement> & {
   date?: DateRange;
   onDateChange?: (date: DateRange | undefined) => void;
@@ -54,7 +54,7 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={onDateChange} // Usamos el prop
+            onSelect={onDateChange} 
             numberOfMonths={2}
           />
         </PopoverContent>

@@ -1,10 +1,10 @@
 import { Employee } from "@/lib/types";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export async function getEmployees(): Promise<Employee[]> {
     
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/employees`);
+        const response = await api.get('/employees');
         return response.data;
     } catch (error) {
         console.error("Error fetching employees:", error);
@@ -15,7 +15,7 @@ export async function getEmployees(): Promise<Employee[]> {
 export async function createEmployee(employee: Employee): Promise<Event> {
     try {
         const { id, ...employeeData } = employee;
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, employeeData);
+        const response = await api.post('/auth/register', employeeData);
         return response.data;
     } catch (error) {
         console.error("Error creating employee:", error);
@@ -25,7 +25,7 @@ export async function createEmployee(employee: Employee): Promise<Event> {
 
 export async function deleteEmployee(id: number): Promise<Employee> {
     try {
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/employees/${id}`);
+        const response = await api.delete(`/employees/${id}`);
         return response.data;
     } catch (error) {
         console.error("Error deleting employee:", error);
