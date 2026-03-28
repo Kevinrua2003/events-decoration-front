@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import React, { FormEvent } from 'react'
 import { DateRange } from 'react-day-picker';
 import Swal from 'sweetalert2';
+import { injectSwalStyles } from '@/lib/swal-config';
 
 const items = [
   { id: 1, name: EmployeeRole.ACCOUNTING_MANAGER, icon: CalculatorIcon },
@@ -46,42 +47,50 @@ function CreateEmployee() {
     if (!selectedType) missingFields.push("Role");
 
     if (missingFields.length > 0) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Missing fields",
-        text: `Please fill in all required fields: ${missingFields.join(', ')}`,
+        title: "Campos incompletos",
+        text: `Por favor completa todos los campos requeridos: ${missingFields.join(', ')}`,
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
     if (!/^\d{8}$/.test(phone)) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Invalid Phone",
-        text: "Phone number must contain exactly 8 digits",
+        title: "Teléfono inválido",
+        text: "El número de teléfono debe tener exactamente 8 dígitos",
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Invalid Email",
-        text: "Please enter a valid email address",
+        title: "Email inválido",
+        text: "Por favor ingresa una dirección de email válida",
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
     if (pass.length < 6) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Weak Password",
-        text: "Password must be at least 6 characters long",
+        title: "Contraseña débil",
+        text: "La contraseña debe tener al menos 6 caracteres",
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
@@ -100,13 +109,15 @@ function CreateEmployee() {
 
     router.push(`../dashboard/employees`);
     
+    injectSwalStyles();
     Swal.fire({
-      title: "Employee Created!",
-      text: "The employee has been successfully registered",
+      title: "¡Empleado creado!",
+      text: "El empleado ha sido registrado exitosamente",
       icon: "success",
-      confirmButtonColor: "black",
-      iconColor: "black",
-    });    
+      confirmButtonColor: "#d4af37",
+      background: "#1a1a1a",
+      color: "#f5f5f0",
+    });
   }
 
   return (

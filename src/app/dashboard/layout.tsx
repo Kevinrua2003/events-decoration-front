@@ -24,6 +24,7 @@ import { usePathname } from "next/navigation";
 import { BellIcon, LogOutIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { createinterceptor } from "@/lib/axios";
+import { showGoodbyeMessage, injectSwalStyles } from "@/lib/swal-config";
 
 export default function DashboardLayout({
   children,
@@ -75,7 +76,12 @@ export default function DashboardLayout({
             <HoverCard>
               <HoverCardTrigger>
                 <button 
-                  onClick={async () => await signOut()}
+                  onClick={async () => {
+                    injectSwalStyles();
+                    const userName = session.data?.user?.name || session.data?.user?.username || 'Usuario';
+                    await showGoodbyeMessage(userName);
+                    await signOut();
+                  }}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-muted transition-colors duration-200 text-sm text-muted-foreground hover:text-foreground"
                 >
                   <LogOutIcon className="h-4 w-4" />

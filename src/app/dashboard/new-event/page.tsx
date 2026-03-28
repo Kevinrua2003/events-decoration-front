@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import React, { FormEvent } from 'react'
 import { DateRange } from 'react-day-picker';
 import Swal from 'sweetalert2';
+import { injectSwalStyles } from '@/lib/swal-config';
 
 const items = [
   { id: 1, name: EventType.WEDDING, icon: MoonStarIcon },
@@ -48,32 +49,38 @@ function CreateEvent() {
     if (!selectedType) missingFields.push("Event type");
 
     if (missingFields.length > 0) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Fields missing",
-        text: `Please fill out all required fields: ${missingFields.join(', ')}`,
+        title: "Campos incompletos",
+        text: `Por favor completa todos los campos requeridos: ${missingFields.join(', ')}`,
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
     if (isNaN(parseInt(cant, 10)) || parseInt(cant, 10) <= 0) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Invalid quantity",
-        text: "Guests quantity must be a valid number greater than 0",
+        title: "Cantidad inválida",
+        text: "La cantidad de invitados debe ser un número mayor a 0",
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
     if(dateRange?.from === undefined || dateRange?.to === undefined) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Invalid date range",
-        text: "Please select a valid date range",
+        title: "Rango de fechas inválido",
+        text: "Por favor selecciona un rango de fechas válido",
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
@@ -81,22 +88,26 @@ function CreateEvent() {
     startDate.setHours(0, 0, 0, 0);
     
     if (startDate < today) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Wrong date range",
-        text: `The start date cannot be before today: ${format(today, 'PP')}. Please select another date past today`,
+        title: "Rango de fechas incorrecto",
+        text: `La fecha de inicio no puede ser anterior a hoy: ${format(today, 'PP')}. Por favor selecciona otra fecha`,
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
     if (dateRange.from > dateRange.to) {
+      injectSwalStyles();
       return Swal.fire({
-        title: "Invalid dates",
-        text: "End date cannot be before start date",
+        title: "Fechas inválidas",
+        text: "La fecha final no puede ser anterior a la fecha de inicio",
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });
     }
 
@@ -116,29 +127,33 @@ function CreateEvent() {
       createdEvent = await createEvent(event);      
     } catch (error) {
       console.error("Error creating event:", error);
+      injectSwalStyles();
       return Swal.fire({
         title: "Error",
         text: `${error}`,
         icon: "error",
-        confirmButtonColor: "black",
-        iconColor: "black",
+        confirmButtonColor: "#d4af37",
+        background: "#1a1a1a",
+        color: "#f5f5f0",
       });      
     }
 
+    injectSwalStyles();
     Swal.fire({
-      title: "New Event",
+      title: "¡Nuevo Evento!",
       html: `
-        <div class="text-left">
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Guests:</strong> ${cant}</p>
-          <p><strong>Dates:</strong> ${format(dateRange.from, 'PP')} - ${format(dateRange.to, 'PP')}</p>
-          <p><strong>Location:</strong> ${location}</p>
-          <p><strong>Type:</strong> ${selectedType}</p>
+        <div class="text-left" style="color: #f5f5f0;">
+          <p><strong>Nombre:</strong> ${name}</p>
+          <p><strong>Invitados:</strong> ${cant}</p>
+          <p><strong>Fechas:</strong> ${format(dateRange.from, 'PP')} - ${format(dateRange.to, 'PP')}</p>
+          <p><strong>Ubicación:</strong> ${location}</p>
+          <p><strong>Tipo:</strong> ${selectedType}</p>
         </div>
       `,
       icon: "success",
-      confirmButtonColor: "black",
-      iconColor: "black",
+      confirmButtonColor: "#d4af37",
+      background: "#1a1a1a",
+      color: "#f5f5f0",
     });
     
     router.push(`../dashboard/resources/${createdEvent.id}`);

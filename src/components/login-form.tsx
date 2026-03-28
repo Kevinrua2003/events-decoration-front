@@ -14,6 +14,7 @@ import Swal from 'sweetalert2'
 import { useRouter } from "next/navigation"
 import { FormEvent, useState } from "react"
 import { signIn } from "next-auth/react"
+import { showWelcomeMessage, injectSwalStyles } from "@/lib/swal-config"
 
 export function LoginForm({
   className,
@@ -38,11 +39,22 @@ export function LoginForm({
     });
 
     if (res?.error) {
-      Swal.fire("Error", "Usuario o contraseña incorrectos", "error");
+      injectSwalStyles();
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Usuario o contraseña incorrectos',
+        background: '#1a1a1a',
+        color: '#f5f5f0',
+        confirmButtonColor: '#d4af37',
+        confirmButtonText: 'Aceptar',
+      });
       setLoading(false);
       return;
     }
 
+    const userName = email.split('@')[0];
+    showWelcomeMessage(userName);
     router.push("/dashboard"); 
   };
 

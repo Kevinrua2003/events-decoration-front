@@ -8,6 +8,7 @@ import { DeleteIcon, PencilIcon, SearchIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import Span from '@/components/Span'
+import { injectSwalStyles, showSuccess } from '@/lib/swal-config'
 
 function Clients() {
 
@@ -43,6 +44,7 @@ function Clients() {
 
   function onDelete(id: number) {
     return async () => {
+      injectSwalStyles();
       const result = await Swal.fire({
         title: '¿Estás seguro?',
         text: "No podrás revertir esto",
@@ -50,11 +52,15 @@ function Clients() {
         showCancelButton: true,
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',
+        background: '#1a1a1a',
+        color: '#f5f5f0',
+        confirmButtonColor: '#d4af37',
+        cancelButtonColor: '#333333',
       });
 
       if (result.isConfirmed) {
         await deleteClient(id);
-        Swal.fire('Eliminado', 'El cliente ha sido eliminado', 'success');
+        showSuccess('¡Eliminado!', 'El cliente ha sido eliminado correctamente');
         setClients(prev => prev.filter(client => client.id !== id));
       }
     }

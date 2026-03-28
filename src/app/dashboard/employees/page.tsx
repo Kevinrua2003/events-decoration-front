@@ -9,6 +9,7 @@ import { DeleteIcon, PencilIcon, SearchIcon, UserPlus2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
+import { injectSwalStyles, showSuccess } from '@/lib/swal-config'
 
 function page() {
 
@@ -45,6 +46,7 @@ function page() {
 
   function onDelete(id: number) {
     return async () => {
+      injectSwalStyles();
       const result = await Swal.fire({
         title: '¿Estás seguro?',
         text: "No podrás revertir esto",
@@ -52,11 +54,15 @@ function page() {
         showCancelButton: true,
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',
+        background: '#1a1a1a',
+        color: '#f5f5f0',
+        confirmButtonColor: '#d4af37',
+        cancelButtonColor: '#333333',
       });
 
       if (result.isConfirmed) {
         await deleteEmployee(id);
-        Swal.fire('Eliminado', 'Empleado eliminado', 'success');
+        showSuccess('¡Eliminado!', 'Empleado eliminado correctamente');
         setEmployees(prev => prev.filter(employee => employee.id !== id));
       }
     }

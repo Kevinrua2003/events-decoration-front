@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { injectSwalStyles, showSuccess, showError, showWarning } from "@/lib/swal-config";
 
 function Page() {
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -65,6 +66,7 @@ function Page() {
   }, [selectedProvider]);
 
   const handleCreateProvider = async () => {
+    injectSwalStyles();
     const result = await Swal.fire({
       title: "Crear Proveedor",
       html: `
@@ -78,6 +80,10 @@ function Page() {
       showCancelButton: true,
       cancelButtonText: "Cancelar",
       confirmButtonText: "Crear",
+      background: '#1a1a1a',
+      color: '#f5f5f0',
+      confirmButtonColor: '#d4af37',
+      cancelButtonColor: '#333333',
       preConfirm: () => {
         const name = (
           document.getElementById("swal-input-name") as HTMLInputElement
@@ -105,12 +111,13 @@ function Page() {
         email,
       };
       await createProvider(newProvider);
-      Swal.fire("Creado", "Nuevo proveedor creado", "success");
+      showSuccess("¡Creado!", "Nuevo proveedor creado exitosamente");
       setProviders([...providers, newProvider]);
     }
   };
 
   const handleDeleteProvider = async (id: number) => {
+    injectSwalStyles();
     const result = await Swal.fire({
       title: "¿Estás seguro?",
       text: "No podrás revertir esto",
@@ -118,10 +125,14 @@ function Page() {
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
+      background: '#1a1a1a',
+      color: '#f5f5f0',
+      confirmButtonColor: '#d4af37',
+      cancelButtonColor: '#333333',
     });
     if (result.isConfirmed) {
       await deleteProvider(id);
-      Swal.fire("Eliminado", "Proveedor eliminado", "success");
+      showSuccess("¡Eliminado!", "Proveedor eliminado correctamente");
       setProviders(providers.filter((prov) => prov.id !== id));
       if (selectedProvider === id) {
         setSelectedProvider(null);
@@ -130,15 +141,16 @@ function Page() {
   };
 
   const handleCreateResource = async (providerId: number) => {
+    injectSwalStyles();
     const result = await Swal.fire({
       title: "Crear Recurso",
       html: `
       <div class="flex flex-col gap-3">
         <div class="flex justify-center gap-4 mb-2">
-          <label class="flex items-center gap-2 cursor-pointer">
+          <label class="flex items-center gap-2 cursor-pointer" style="color: #f5f5f0;">
             <input type="radio" name="resourceType" value="product" checked> Producto
           </label>
-          <label class="flex items-center gap-2 cursor-pointer">
+          <label class="flex items-center gap-2 cursor-pointer" style="color: #f5f5f0;">
             <input type="radio" name="resourceType" value="service"> Servicio
           </label>
         </div>
@@ -152,6 +164,10 @@ function Page() {
       showCancelButton: true,
       cancelButtonText: "Cancelar",
       confirmButtonText: "Crear",
+      background: '#1a1a1a',
+      color: '#f5f5f0',
+      confirmButtonColor: '#d4af37',
+      cancelButtonColor: '#333333',
       preConfirm: () => {
         const resourceType = (
           document.querySelector(
@@ -209,15 +225,16 @@ function Page() {
           await createService(serv);
           setServices([...services, serv]);
         }
-        Swal.fire("Creado", "Recurso creado exitosamente", "success");
+        showSuccess("¡Creado!", "Recurso creado exitosamente");
       } catch (error) {
-        Swal.fire("Error", `Error al crear recurso: ${error}`, "error");
+        showError("Error", `Error al crear recurso: ${error}`);
       }
     }
   };
 
   const onDeleteResource = useCallback(
     (id: number, isProduct: boolean) => async () => {
+      injectSwalStyles();
       const result = await Swal.fire({
         title: "¿Estás seguro?",
         text: "No podrás revertir esto",
@@ -225,6 +242,10 @@ function Page() {
         showCancelButton: true,
         confirmButtonText: "Sí, eliminar",
         cancelButtonText: "Cancelar",
+        background: '#1a1a1a',
+        color: '#f5f5f0',
+        confirmButtonColor: '#d4af37',
+        cancelButtonColor: '#333333',
       });
       if (result.isConfirmed) {
         isProduct ? await deleteProduct(id) : await deleteService(id);
@@ -233,7 +254,7 @@ function Page() {
         } else {
           setServices(services.filter(s => s.id !== id));
         }
-        Swal.fire("Eliminado", "Recurso eliminado", "success");
+        showSuccess("¡Eliminado!", "Recurso eliminado correctamente");
       }
     },
     [products, services]
@@ -273,7 +294,7 @@ function Page() {
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{provider.name}</span>
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteProvider(provider.id);
@@ -281,7 +302,7 @@ function Page() {
                       className="p-1 rounded hover:bg-muted"
                     >
                       <DeleteIcon className="h-4 w-4 text-muted-foreground" />
-                    </button>
+                    </Button>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-1">
                     <Badge variant="secondary" className="text-xs">{provider.phone}</Badge>
@@ -336,12 +357,12 @@ function Page() {
                       <Badge>Producto</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <button
+                      <Button
                         onClick={onDeleteResource(prod.id, true)}
                         className="p-2 rounded-md hover:bg-muted transition-colors"
                       >
                         <DeleteIcon className="h-4 w-4 text-muted-foreground" />
-                      </button>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -353,12 +374,12 @@ function Page() {
                       <Badge variant="outline">Servicio</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <button
+                      <Button
                         onClick={onDeleteResource(serv.id, false)}
                         className="p-2 rounded-md hover:bg-muted transition-colors"
                       >
                         <DeleteIcon className="h-4 w-4 text-muted-foreground" />
-                      </button>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

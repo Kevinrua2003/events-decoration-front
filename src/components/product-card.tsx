@@ -14,6 +14,7 @@ import { useState } from "react";
 import {Slider} from "@/components/ui/slider"
 import { Label } from "./ui/label";
 import { ContractedProduct } from "./client-data";
+import { injectSwalStyles } from "@/lib/swal-config";
 
 interface ProductCardProps {
   product: Product;
@@ -37,7 +38,8 @@ export function ProductCard({
           src={product.image || "/placeholder.svg?height=128&width=256"}
           alt={product.name}
           fill
-          onClick={() =>
+          onClick={() => {
+            injectSwalStyles();
             Swal.fire({
               showConfirmButton: false,
               showCancelButton: false,
@@ -51,8 +53,10 @@ export function ProductCard({
                   />
                 </div>
               `,
+              background: '#1a1a1a',
+              color: '#f5f5f0',
             })           
-          }
+          }}
           className="object-cover rounded"
           priority
         />

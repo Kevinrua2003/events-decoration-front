@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Span from '@/components/Span';
+import { injectSwalStyles, showSuccess, showError } from '@/lib/swal-config';
 
   function EventsPage() {
 
@@ -51,6 +52,7 @@ import Span from '@/components/Span';
 
     function onDelete(id: number) {
       return async () => {
+        injectSwalStyles();
         const result = await Swal.fire({
           title: '¿Estás seguro?',
           text: "No podrás revertir esto",
@@ -58,11 +60,15 @@ import Span from '@/components/Span';
           showCancelButton: true,
           confirmButtonText: 'Sí, eliminar',
           cancelButtonText: 'Cancelar',
+          background: '#1a1a1a',
+          color: '#f5f5f0',
+          confirmButtonColor: '#d4af37',
+          cancelButtonColor: '#333333',
         });
 
         if (result.isConfirmed) {
           await deleteEvent(id);
-          Swal.fire('Eliminado', 'El evento ha sido eliminado', 'success');
+          showSuccess('¡Eliminado!', 'El evento ha sido eliminado');
           setEvents(prev => prev.filter(event => event.id !== id));
         }
       }

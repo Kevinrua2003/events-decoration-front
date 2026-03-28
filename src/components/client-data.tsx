@@ -10,6 +10,7 @@ import Swal from 'sweetalert2'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { getClientByEmail, createClient } from "@/api/clients/main"
 import { getContracts, createContract, createContractItem } from "@/api/contracts/main"
+import { injectSwalStyles, showSuccess, showError, showWarning } from "@/lib/swal-config"
 
 export interface ContractedProduct {prodId: number, quantity: number, price: number};
 export interface ContractedService {servId: number, quantity: number, price: number};
@@ -91,12 +92,15 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
 
         const createdContract: Contract = await createContract(contract);
 
+        injectSwalStyles();
         Swal.fire({
-          title: 'Successful operation',
-          text: 'Contract has been created.',
+          title: '¡Operación exitosa!',
+          text: 'El contrato ha sido creado.',
           icon: 'success',
           confirmButtonText: 'Aceptar',
-          confirmButtonColor: '#000',
+          confirmButtonColor: '#d4af37',
+          background: '#1a1a1a',
+          color: '#f5f5f0',
         });
         
         return createdContract;
@@ -128,14 +132,18 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
       }
   
       if (exists) {
+        injectSwalStyles();
         const selection = await Swal.fire({
-          title: '¿Already have a contract?',
-          html: `Client already has a contract for this event.<br>¿Add resources to existing contract?`,
+          title: '¿Ya existe un contrato?',
+          html: `El cliente ya tiene un contrato para este evento.<br>¿Agregar recursos al contrato existente?`,
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonText: 'Create new',
-          cancelButtonText: 'Cancel',
-          confirmButtonColor: '#000',
+          confirmButtonText: 'Crear nuevo',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#d4af37',
+          cancelButtonColor: '#333333',
+          background: '#1a1a1a',
+          color: '#f5f5f0',
         });
   
         if (selection.isConfirmed) {
@@ -149,11 +157,14 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
         await createContractItems(createdContract);
       }
     } catch (error: any) {
+      injectSwalStyles();
       Swal.fire({
         title: 'Error',
-        text: error instanceof Error ? error.message : 'Error in operation',
+        text: error instanceof Error ? error.message : 'Error en la operación',
         icon: 'error',
-        confirmButtonColor: '#000',
+        confirmButtonColor: '#d4af37',
+        background: '#1a1a1a',
+        color: '#f5f5f0',
       });
     } finally {
       setIsSubmitting(false);
