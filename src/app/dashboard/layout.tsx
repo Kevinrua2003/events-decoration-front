@@ -19,11 +19,11 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "../../components/ui/hover-card";
-import React, { Fragment } from "react";
-import { usePathname } from "next/navigation";
-import { BellIcon, LogOutIcon } from "lucide-react";
-import { signOut } from "next-auth/react";
-import { useApi } from "@/hooks/use-api";
+import React, { Fragment, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { BellIcon, LogOutIcon, UserIcon } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import { createinterceptor } from "@/lib/axios";
 
 export default function DashboardLayout({
   children,
@@ -31,9 +31,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathName = usePathname();
-  const paths = pathName.split("/");
-  
-  useApi();
+  const paths = pathName.split("/");  
+  const session = useSession();
+
+  createinterceptor(session.data?.backendTokens.accessToken);
   
   function formatBreadcrumb(item: string): string {
     const formatted = item.replace(/-/g, " ");
