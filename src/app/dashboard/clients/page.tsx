@@ -27,17 +27,19 @@ function Clients() {
     fetchClients();
   }, []);
 
-  useEffect(() => {
-    const filterClients = async () => {
-      const aux = data.filter((client) => {
-        const fullName = `${client.firstName} ${client.lastName}`.toLowerCase();
-        const email = client.email.toLowerCase();
-        return fullName.includes(search.toLowerCase()) || email.includes(search.toLowerCase());
-      })
-      setClients(aux);
-    };
-    filterClients();
-  }, [search, data]);
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    if (value === '') {
+      setClients(data);
+      return;
+    }
+    const filtered = data.filter((client) => {
+      const fullName = `${client.firstName} ${client.lastName}`.toLowerCase();
+      const email = client.email.toLowerCase();
+      return fullName.includes(value.toLowerCase()) || email.includes(value.toLowerCase());
+    });
+    setClients(filtered);
+  };
 
   function onDelete(id: number) {
     return async () => {
@@ -68,7 +70,7 @@ function Clients() {
             placeholder="Buscar clientes por nombre o email..."
             className="pl-9"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
       </div>

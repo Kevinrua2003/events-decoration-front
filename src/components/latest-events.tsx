@@ -1,7 +1,7 @@
 'use client'
 import { getEvents } from '@/api/events/main';
 import { Event, EventType } from '@/lib/types';
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { LucideBriefcaseBusiness, MoonStarIcon, PartyPopperIcon, SearchSlashIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -28,7 +28,7 @@ const eventTypeIcons = [
     },
 ]
 
-function LatestEventItem({ event }: { event: Event }) {
+const LatestEventItem = memo(function LatestEventItem({ event }: { event: Event }) {
     const item = eventTypeIcons.find(x => x.type === event.type);
 
     return (
@@ -45,8 +45,14 @@ function LatestEventItem({ event }: { event: Event }) {
             </div>
         </div>
     );
-}
+});
 
+function getLatestEvents(events: Event[], count: number): Event[] {
+    const sorted = events.toSorted((x, y) => 
+        new Date(y.startDate).getTime() - new Date(x.startDate).getTime()
+    );
+    return sorted.slice(0, count);
+}
 
 function LatestEvents() {
 
@@ -56,8 +62,7 @@ function LatestEvents() {
     useEffect(() => {
         async function fetchEvents(){            
             const result = await getEvents();            
-            const sorted = result.sort((x,y) => new Date(y.startDate).getTime() - new Date(x.startDate).getTime());
-            const latestEvents: Event[] = sorted.slice(0,5);
+            const latestEvents = getLatestEvents(result, 5);
             setEvents(latestEvents);
             setLoading(false);
         }

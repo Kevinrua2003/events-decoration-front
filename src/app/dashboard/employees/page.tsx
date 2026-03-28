@@ -29,17 +29,19 @@ function page() {
     fetchEmployees();
   }, []);
 
-  useEffect(() => {
-    const filterEmployees = async () => {
-      const aux = data.filter((employee) => {
-        const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
-        const email = employee.email.toLowerCase();
-        return fullName.includes(search.toLowerCase()) || email.includes(search.toLowerCase());
-      })
-      setEmployees(aux);
-    };
-    filterEmployees();
-  }, [search, data]);
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    if (value === '') {
+      setEmployees(data);
+      return;
+    }
+    const filtered = data.filter((employee) => {
+      const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
+      const email = employee.email.toLowerCase();
+      return fullName.includes(value.toLowerCase()) || email.includes(value.toLowerCase());
+    });
+    setEmployees(filtered);
+  };
 
   function onDelete(id: number) {
     return async () => {
@@ -71,7 +73,7 @@ function page() {
               placeholder="Buscar empleados..."
               className="pl-9 w-full sm:w-64"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
         </div>
