@@ -19,9 +19,9 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "../../components/ui/hover-card";
-import React, { Fragment, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { BellIcon, LogOutIcon, UserIcon } from "lucide-react";
+import React, { Fragment } from "react";
+import { usePathname } from "next/navigation";
+import { BellIcon, LogOutIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { createinterceptor } from "@/lib/axios";
 
@@ -72,9 +72,6 @@ export default function DashboardLayout({
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-2 rounded-md hover:bg-muted transition-colors duration-200">
-              <BellIcon className="h-4 w-4 text-muted-foreground" />
-            </button>
             <HoverCard>
               <HoverCardTrigger>
                 <button 

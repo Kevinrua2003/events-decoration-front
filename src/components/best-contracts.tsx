@@ -2,8 +2,7 @@
 import { getClients } from "@/api/clients/main";
 import { getContractItems, getContracts } from "@/api/contracts/main";
 import { getEvents } from "@/api/events/main";
-import { Contract } from "@/lib/types";
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -19,6 +18,22 @@ interface Props {
   eventName: string;
   money: number;
 }
+
+const BestContractsRow = memo(function BestContractsRow({ item }: { item: Props }) {
+  return (
+    <TableRow key={item.contractId} className="hover:bg-muted/50">
+      <TableCell className="font-medium truncate max-w-[150px]">
+        {item.eventName}
+      </TableCell>
+      <TableCell className="hidden md:table-cell text-muted-foreground">
+        {item.clientName}
+      </TableCell>
+      <TableCell className="text-right font-medium">
+        ${item.money.toLocaleString()}
+      </TableCell>
+    </TableRow>
+  );
+});
 
 function BestContracts() {
   const [listItems, setListItems] = useState<Props[]>([]);
@@ -60,7 +75,7 @@ function BestContracts() {
           };
         });
 
-        const sorted = list.sort((a, b) => b.money - a.money);
+        const sorted = list.toSorted((a, b) => b.money - a.money);
         setListItems(sorted.slice(0, 10));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -89,17 +104,7 @@ function BestContracts() {
           </TableHeader>
           <TableBody>
             {listItems.map((item) => (
-              <TableRow key={item.contractId} className="hover:bg-muted/50">
-                <TableCell className="font-medium truncate max-w-[150px]">
-                  {item.eventName}
-                </TableCell>
-                <TableCell className="hidden md:table-cell text-muted-foreground">
-                  {item.clientName}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  ${item.money.toLocaleString()}
-                </TableCell>
-              </TableRow>
+              <BestContractsRow key={item.contractId} item={item} />
             ))}
           </TableBody>
         </Table>

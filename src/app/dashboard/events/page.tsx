@@ -37,16 +37,17 @@ import Span from '@/components/Span';
       fetchEvents();
     }, []);
 
-    useEffect(() => {
-      const filterEvents = async () => {
-        const aux = data.filter((event) => {
-          const name = event.name.toLowerCase();
-          return name.includes(search.toLowerCase());
-        })
-        setEvents(aux);
-      };
-      filterEvents();
-    }, [search, data]);
+    const handleSearch = (value: string) => {
+      setSearch(value);
+      if (value === '') {
+        setEvents(data);
+        return;
+      }
+      const filtered = data.filter((event) => 
+        event.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setEvents(filtered);
+    };
 
     function onDelete(id: number) {
       return async () => {
@@ -78,7 +79,7 @@ import Span from '@/components/Span';
                 placeholder="Buscar eventos..."
                 className="pl-9 w-full sm:w-64"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
           </div>
