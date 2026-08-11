@@ -8,20 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Event, EventType, Location } from '@/lib/types';
+import { eventTypeItems } from '@/lib/constants';
 import { addDays, format } from 'date-fns';
-import { LucideBriefcaseBusiness, MoonStarIcon, PartyPopperIcon, PlusIcon, SearchSlashIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { FormEvent } from 'react'
 import { DateRange } from 'react-day-picker';
 import Swal from 'sweetalert2';
 import { injectSwalStyles } from '@/lib/swal-config';
-
-const items = [
-  { id: 1, name: EventType.WEDDING, icon: MoonStarIcon },
-  { id: 2, name: EventType.BIRTHDAY, icon: PartyPopperIcon },
-  { id: 3, name: EventType.CORPORATE, icon: LucideBriefcaseBusiness },
-  { id: 4, name: EventType.OTHER, icon: SearchSlashIcon },
-];
 
 function CreateEvent() {
   const [location, setLocation] = React.useState("")
@@ -181,7 +175,7 @@ function CreateEvent() {
           </div>
           <div className="grid gap-2 md:gap-3 p-2 md:p-3 rounded-md border-2">
             <h2 className='text-center text-sm md:text-base'>Event type</h2>
-            <ToggleItemsSelector items={items} value={selectedType} onValueChange={setSelectedType}/>
+            <ToggleItemsSelector items={eventTypeItems} value={selectedType} onValueChange={setSelectedType}/>
           </div>
           <Button className="w-full text-sm md:text-base" type="submit">
             <PlusIcon className="h-4 w-4 md:h-5 md:w-5"/>

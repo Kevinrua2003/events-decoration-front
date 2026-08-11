@@ -9,15 +9,16 @@ import {
     TableRow,
   } from "@/components/ui/table"  
 import { format } from 'date-fns';
-import { DeleteIcon, EyeIcon, PackagePlusIcon, PersonStandingIcon, SearchIcon, UserPlus2Icon } from 'lucide-react';
+import { DeleteIcon, PackagePlusIcon, PencilIcon, PersonStandingIcon, SearchIcon, UserPlus2Icon } from 'lucide-react';
 import Swal from 'sweetalert2';  
 import { deleteEvent, getEvents } from '@/api/events/main';
 import { Event } from '@/lib/types';
+import EditEventDialog from '@/components/edit-event-dialog';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Span from '@/components/Span';
-import { injectSwalStyles, showSuccess, showError } from '@/lib/swal-config';
+import { injectSwalStyles, showSuccess } from '@/lib/swal-config';
 
   function EventsPage() {
 
@@ -26,6 +27,7 @@ import { injectSwalStyles, showSuccess, showError } from '@/lib/swal-config';
     const [data, setData] = useState<Event[]>([]);
     const [search, setSearch] = useState<string>('');
     const [loading, setLoading] = useState(true);
+    const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
     useEffect(() => {
       const fetchEvents = async () => {
@@ -37,6 +39,11 @@ import { injectSwalStyles, showSuccess, showError } from '@/lib/swal-config';
       }
       fetchEvents();
     }, []);
+
+    const handleEventSaved = (updated: Event) => {
+      setEvents(prev => prev.map(event => event.id === updated.id ? updated : event));
+      setData(prev => prev.map(event => event.id === updated.id ? updated : event));
+    };
 
     const handleSearch = (value: string) => {
       setSearch(value);
@@ -145,11 +152,11 @@ import { injectSwalStyles, showSuccess, showError } from '@/lib/swal-config';
                       <div className='flex gap-1 justify-end'>
                         <button 
                           type='button'
-                          title='Ver detalles'
+                          title='Editar'
                           className='p-2 rounded-md hover:bg-muted transition-colors'
-                          onClick={() => Swal.fire("Implementar")}
+                          onClick={() => setEditingEvent(event)}
                         >
-                          <EyeIcon className="h-4 w-4 text-muted-foreground"/>
+                          <PencilIcon className="h-4 w-4 text-muted-foreground"/>
                         </button>
                         <button 
                           type='button'
@@ -175,6 +182,12 @@ import { injectSwalStyles, showSuccess, showError } from '@/lib/swal-config';
             </Table>
           </div>
         )}
+        <EditEventDialog
+          event={editingEvent}
+          open={!!editingEvent}
+          onOpenChange={(open) => !open && setEditingEvent(null)}
+          onSaved={handleEventSaved}
+        />
       </div>
     )
   }

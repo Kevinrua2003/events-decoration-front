@@ -55,7 +55,7 @@ export async function getContractItems(): Promise<ContractItem[]> {
     }
 }
 
-export async function createContractItem(contractItem: ContractItem): Promise<Event> {
+export async function createContractItem(contractItem: ContractItem): Promise<ContractItem> {
     try {
         const { id, ...contractItemData } = contractItem;
         const response = await api.post('/contract-items', contractItemData);

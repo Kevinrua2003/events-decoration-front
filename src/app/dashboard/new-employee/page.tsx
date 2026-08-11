@@ -5,22 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Employee, EmployeeRole } from '@/lib/types';
+import { EmployeeInput, EmployeeRole } from '@/lib/types';
+import { employeeRoleItems } from '@/lib/constants';
 import { addDays } from 'date-fns';
-import { CalculatorIcon, CrownIcon, HandshakeIcon, PlusIcon, UserIcon, UsersIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { FormEvent } from 'react'
 import { DateRange } from 'react-day-picker';
 import Swal from 'sweetalert2';
 import { injectSwalStyles } from '@/lib/swal-config';
-
-const items = [
-  { id: 1, name: EmployeeRole.ACCOUNTING_MANAGER, icon: CalculatorIcon },
-  { id: 2, name: EmployeeRole.CEO, icon: CrownIcon },
-  { id: 3, name: EmployeeRole.HR_MANAGER, icon: UsersIcon },
-  { id: 4, name: EmployeeRole.STAFF, icon: UserIcon },
-  { id: 5, name: EmployeeRole.UNION_SECRETARY, icon: HandshakeIcon },
-];
 
 function CreateEmployee() {
   const [selectedType, setSelectedType] = React.useState("")
@@ -94,8 +87,7 @@ function CreateEmployee() {
       });
     }
 
-    const employee: Employee = {
-      id: 0,
+    const employee: EmployeeInput = {
       firstName,
       lastName,
       email,
@@ -145,7 +137,7 @@ function CreateEmployee() {
             </div>                
           </div>
           <div className="grid gap-2 md:gap-3 p-2 md:p-3 rounded-md border-2">
-            <ToggleItemsSelector items={items} value={selectedType} onValueChange={setSelectedType}/>
+            <ToggleItemsSelector items={employeeRoleItems} value={selectedType} onValueChange={setSelectedType}/>
           </div>
           <Button className="w-full text-sm md:text-base" type="submit">
             <PlusIcon className="h-4 w-4 md:h-5 md:w-5"/>

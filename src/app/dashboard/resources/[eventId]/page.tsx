@@ -8,7 +8,6 @@ import ClientData, { ContractedProduct, ContractedService } from '@/components/c
 import { getProducts } from '@/api/products/main';
 import { getServices } from '@/api/services/main';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import Swal from 'sweetalert2';
 import ServiceItem from '@/components/service-item';
 import ContractedResources, { ContractedResourceItem } from '@/components/contracted-resources';
 
@@ -55,16 +54,6 @@ function ResourcesPage() {
     }
     fetchResources();
   }, []);
-
-  useEffect(() => {
-    Swal.fire({
-      title: 'Select resources',
-      text: 'Select the products or services you want to add to the event',
-      icon: 'info',
-      iconColor: 'black',
-      confirmButtonColor: 'black'
-    });
-  }, [])
 
   const contractedProducts: ContractedResourceItem[] = selectedProducts
     .map((selected) => {

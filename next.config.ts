@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  env: {
-    BACKEND: `${process.env.NEXT_PUBLIC_API_URL}`,
-  },
 };
 
 export default nextConfig;

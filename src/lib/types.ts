@@ -70,8 +70,16 @@ export interface Employee {
   phone: string
   role: EmployeeRole
   username: string
+}
+
+export interface EmployeeInput {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  role: EmployeeRole
+  username: string
   password: string
-  
 }
 
 export interface Client {

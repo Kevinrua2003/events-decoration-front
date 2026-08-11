@@ -1,10 +1,6 @@
 import React from 'react'
 import { ScrollArea } from './ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Separator } from './ui/separator';
-import { Product, ResourceType, Service } from '@/lib/types';
-import { Button } from './ui/button';
-import { Sumana } from 'next/font/google';
 
 interface ContractedResourcesProps {
   products: ContractedResourceItem[];

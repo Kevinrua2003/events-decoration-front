@@ -33,9 +33,11 @@ const eventTypeColors: Record<EventType, string> = {
   [EventType.OTHER]: "#737373",
 };
 
-const calculateAmmount = async (type: EventType): Promise<number> => {
-  const events = await getEvents();
-  return events.reduce((acc, item) => (item.type === type ? acc + 1 : acc), 0);
+const typeLabels: Record<EventType, string> = {
+  [EventType.BIRTHDAY]: "Cumpleaños",
+  [EventType.CORPORATE]: "Corporativo",
+  [EventType.WEDDING]: "Boda",
+  [EventType.OTHER]: "Otro",
 };
 
 interface ChartItem {
@@ -49,14 +51,16 @@ function EventsChart() {
 
   useEffect(() => {
     async function loadData() {
-      const data = await Promise.all(
-        categories.map(async (cat) => ({
-          type: cat === EventType.BIRTHDAY ? 'Cumpleaños' : 
-                cat === EventType.CORPORATE ? 'Corporativo' :
-                cat === EventType.WEDDING ? 'Boda' : 'Otro',
-          ammount: await calculateAmmount(cat),
-        }))
-      );
+      const events = await getEvents();
+
+      const data = categories.map((category) => ({
+        type: typeLabels[category],
+        ammount: events.reduce(
+          (acc, item) => (item.type === category ? acc + 1 : acc),
+          0
+        ),
+      }));
+
       setChartData(data);
       setLoading(false);
     }
@@ -89,15 +93,12 @@ function EventsChart() {
               />
               <Tooltip content={<ChartTooltipContent />} />
               <Bar dataKey="ammount" radius={3} fill="#171717" animationDuration={500}>
-                {chartData.map((entry, index) => {
-                  const originalType = categories[index];
-                  return (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={eventTypeColors[originalType] || "#737373"}
-                    />
-                  );
-                })}
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={eventTypeColors[categories[index]] || "#737373"}
+                  />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>

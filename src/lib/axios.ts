@@ -1,19 +1,29 @@
 import axios from "axios";
-import { useSession } from "next-auth/react";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
-export function createinterceptor (token: any) {
-  api.interceptors.request.use(async (config) => {
-  
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+let interceptorRegistered = false;
+let authToken: string | null = null;
 
-  return config;
-});
+/**
+ * Registers a single request interceptor (idempotent) that attaches the
+ * current access token. Call it on every render with the latest token;
+ * the interceptor is only created once.
+ */
+export function createinterceptor(token: string | null | undefined) {
+  authToken = token ?? null;
+
+  if (!interceptorRegistered) {
+    api.interceptors.request.use((config) => {
+      if (authToken) {
+        config.headers.Authorization = `Bearer ${authToken}`;
+      }
+      return config;
+    });
+    interceptorRegistered = true;
+  }
 }
 
 export default api;

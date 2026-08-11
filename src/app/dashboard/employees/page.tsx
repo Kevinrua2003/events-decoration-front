@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Employee } from '@/lib/types'
+import EditEmployeeDialog from '@/components/edit-employee-dialog'
 import { DeleteIcon, PencilIcon, SearchIcon, UserPlus2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -18,6 +19,12 @@ function page() {
   const [data, setData] = useState<Employee[]>([]);
   const [search, setSearch] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+
+  const handleEmployeeSaved = (updated: Employee) => {
+    setEmployees(prev => prev.map(employee => employee.id === updated.id ? updated : employee));
+    setData(prev => prev.map(employee => employee.id === updated.id ? updated : employee));
+  };
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -132,7 +139,7 @@ function page() {
                         type='button'
                         title='Editar'
                         className='p-2 rounded-md hover:bg-muted transition-colors'
-                        onClick={() => Swal.fire("IMPLEMENTAR")}
+                        onClick={() => setEditingEmployee(employee)}
                       >
                         <PencilIcon className="h-4 w-4 text-muted-foreground"/>
                       </button>
@@ -150,8 +157,13 @@ function page() {
               ))}
             </TableBody>
           </Table>
-        </div>
-      )}
+        </div>        )}
+      <EditEmployeeDialog
+        employee={editingEmployee}
+        open={!!editingEmployee}
+        onOpenChange={(open) => !open && setEditingEmployee(null)}
+        onSaved={handleEmployeeSaved}
+      />
     </div>
   )
 }

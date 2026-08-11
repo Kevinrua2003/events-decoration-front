@@ -1,4 +1,4 @@
-import { Employee } from "@/lib/types";
+import { Employee, EmployeeInput } from "@/lib/types";
 import api from "@/lib/axios";
 
 export async function getEmployees(): Promise<Employee[]> {
@@ -12,13 +12,22 @@ export async function getEmployees(): Promise<Employee[]> {
     }
 }
 
-export async function createEmployee(employee: Employee): Promise<Event> {
+export async function createEmployee(employee: EmployeeInput): Promise<Employee> {
     try {
-        const { id, ...employeeData } = employee;
-        const response = await api.post('/auth/register', employeeData);
+        const response = await api.post('/auth/register', employee);
         return response.data;
     } catch (error) {
         console.error("Error creating employee:", error);
+        throw error;
+    }
+}
+
+export async function updateEmployee(id: number, employee: Partial<Employee> & { password?: string }): Promise<Employee> {
+    try {
+        const response = await api.patch(`/employees/${id}`, employee);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating employee:", error);
         throw error;
     }
 }

@@ -138,7 +138,7 @@ function ClientData({ eventId, productIds, serviceIds }: ClientDataProps) {
           html: `El cliente ya tiene un contrato para este evento.<br>¿Agregar recursos al contrato existente?`,
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonText: 'Crear nuevo',
+          confirmButtonText: 'Agregar recursos',
           cancelButtonText: 'Cancelar',
           confirmButtonColor: '#d4af37',
           cancelButtonColor: '#333333',

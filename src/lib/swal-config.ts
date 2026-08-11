@@ -16,7 +16,6 @@ export const swalCustomTheme = Swal.mixin({
   confirmButtonColor: '#d4af37',
   cancelButtonColor: '#333333',
   padding: '24px',
-  borderRadius: '12px',
 });
 
 export const swalStyles = `
@@ -208,6 +207,11 @@ export const showError = (title: string, message: string) => {
     confirmButtonColor: '#d4af37',
   });
 };
+
+export function getErrorMessage(error: any, fallback = "No se pudieron guardar los cambios"): string {
+  const message = error?.response?.data?.message ?? error?.message ?? fallback;
+  return typeof message === "string" ? message : fallback;
+}
 
 export const showWarning = (title: string, message: string) => {
   injectSwalStyles();

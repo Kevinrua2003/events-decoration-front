@@ -34,6 +34,16 @@ export async function createEvent(event: Event): Promise<Event> {
     }
 }
 
+export async function updateEvent(id: number, event: Partial<Event>): Promise<Event> {
+    try {
+        const response = await api.patch(`/events/${id}`, event);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating event:", error);
+        throw error;
+    }
+}
+
 export async function deleteEvent(id: number): Promise<Event> {
     try {
         const response = await api.delete(`/events/${id}`);

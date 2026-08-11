@@ -78,7 +78,7 @@ export default function DashboardLayout({
                 <button 
                   onClick={async () => {
                     injectSwalStyles();
-                    const userName = session.data?.user?.name || session.data?.user?.username || 'Usuario';
+                    const userName = session.data?.user?.username || 'Usuario';
                     await showGoodbyeMessage(userName);
                     await signOut();
                   }}

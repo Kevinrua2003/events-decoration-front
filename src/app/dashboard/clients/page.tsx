@@ -4,10 +4,10 @@ import { deleteClient, getClients } from '@/api/clients/main'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Client } from '@/lib/types'
+import EditClientDialog from '@/components/edit-client-dialog'
 import { DeleteIcon, PencilIcon, SearchIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
-import Span from '@/components/Span'
 import { injectSwalStyles, showSuccess } from '@/lib/swal-config'
 
 function Clients() {
@@ -16,6 +16,12 @@ function Clients() {
   const [data, setData] = useState<Client[]>([]);
   const [search, setSearch] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+
+  const handleClientSaved = (updated: Client) => {
+    setClients(prev => prev.map(client => client.id === updated.id ? updated : client));
+    setData(prev => prev.map(client => client.id === updated.id ? updated : client));
+  };
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -118,7 +124,7 @@ function Clients() {
                         type='button'
                         title='Editar'
                         className='p-2 rounded-md hover:bg-muted transition-colors'
-                        onClick={() => Swal.fire("IMPLEMENTAR")}
+                        onClick={() => setEditingClient(client)}
                       >
                         <PencilIcon className="h-4 w-4 text-muted-foreground"/>
                       </button>
@@ -136,8 +142,13 @@ function Clients() {
               ))}
             </TableBody>
           </Table>
-        </div>
-      )}
+        </div>        )}
+      <EditClientDialog
+        client={editingClient}
+        open={!!editingClient}
+        onOpenChange={(open) => !open && setEditingClient(null)}
+        onSaved={handleClientSaved}
+      />
     </div>
   )
 }
