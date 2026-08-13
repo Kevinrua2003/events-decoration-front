@@ -15,6 +15,7 @@ import {Slider} from "@/components/ui/slider"
 import { Label } from "./ui/label";
 import { ContractedProduct } from "./client-data";
 import { injectSwalStyles } from "@/lib/swal-config";
+import { resolveImageUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -31,11 +32,13 @@ export function ProductCard({
 
   const [quantity, setQuantity] = useState<number>(1);
 
+  const image = resolveImageUrl(product.image);
+
   return (
     <Card className="w-full hover:scale-[1.02] max-w-xs overflow-hidden transition-all hover:shadow-md border border-gray-200 rounded-md p-2">
       <div className="relative h-24 md:h-28 w-full">
-        <Image
-          src={product.image || "/placeholder.svg?height=128&width=256"}
+<Image
+          src={image}
           alt={product.name}
           fill
           onClick={() => {
@@ -47,7 +50,7 @@ export function ProductCard({
               html: `
                 <div class="flex justify-center items-center">
                   <img
-                    src="${product.image || "/placeholder.svg?height=128&width=256"}"
+                    src="${image}"
                     alt="${product.name}"
                     class="object-cover rounded"
                   />

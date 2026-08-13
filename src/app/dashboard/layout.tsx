@@ -35,7 +35,7 @@ export default function DashboardLayout({
   const paths = pathName.split("/");  
   const session = useSession();
 
-  createinterceptor(session.data?.backendTokens.accessToken);
+  createinterceptor(session.data?.backendTokens);
   
   function formatBreadcrumb(item: string): string {
     const formatted = item.replace(/-/g, " ");
