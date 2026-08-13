@@ -1,10 +1,12 @@
 import { Provider } from "@/lib/types";
 import api from "@/lib/axios";
+import { Pagination } from "@/api/events/main";
 
-export async function getProviders(): Promise<Provider[]> {
-    
+export async function getProviders({ limit, offset }: Pagination = {}): Promise<Provider[]> {
     try {
-        const response = await api.get('/providers');
+        const response = await api.get('/providers', {
+            params: { limit, offset },
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching providers:", error);

@@ -1,7 +1,6 @@
 'use client'
-import { getEvents } from '@/api/events/main';
 import { Event, EventType } from '@/lib/types';
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useMemo } from 'react'
 import { LucideBriefcaseBusiness, MoonStarIcon, PartyPopperIcon, SearchSlashIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -48,42 +47,33 @@ const LatestEventItem = memo(function LatestEventItem({ event }: { event: Event 
 });
 
 function getLatestEvents(events: Event[], count: number): Event[] {
-    const sorted = events.toSorted((x, y) => 
-        new Date(y.startDate).getTime() - new Date(x.startDate).getTime()
-    );
+    const sorted = events
+        .slice()
+        .sort(
+            (x, y) =>
+                new Date(y.startDate).getTime() - new Date(x.startDate).getTime()
+        );
     return sorted.slice(0, count);
 }
 
-function LatestEvents() {
+function LatestEvents({ events, loading }: { events: Event[]; loading?: boolean }) {
+    const latest = useMemo(() => getLatestEvents(events, 5), [events]);
 
-    const [events, setEvents] = useState<Event[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function fetchEvents(){            
-            const result = await getEvents();            
-            const latestEvents = getLatestEvents(result, 5);
-            setEvents(latestEvents);
-            setLoading(false);
-        }
-        fetchEvents();
-    }, []);
-
-  return (
-    <div>
-        {loading ? (
-            <div className="p-4 text-center text-muted-foreground">Cargando...</div>
-        ) : events.length === 0 ? (
-            <div className="p-4 text-center text-muted-foreground">No hay eventos</div>
-        ) : (
-            <div className='flex gap-3 overflow-x-auto pb-2 -mx-2 px-2'>
-                {events.map((event) => (
-                    <LatestEventItem key={event.id} event={event}/>
-                ))}
-            </div>
-        )}
-    </div>
-  )
+    return (
+        <div>
+            {loading ? (
+                <div className="p-4 text-center text-muted-foreground">Cargando...</div>
+            ) : latest.length === 0 ? (
+                <div className="p-4 text-center text-muted-foreground">No hay eventos</div>
+            ) : (
+                <div className='flex gap-3 overflow-x-auto pb-2 -mx-2 px-2'>
+                    {latest.map((event) => (
+                        <LatestEventItem key={event.id} event={event}/>
+                    ))}
+                </div>
+            )}
+        </div>
+    )
 }
 
 export default LatestEvents;

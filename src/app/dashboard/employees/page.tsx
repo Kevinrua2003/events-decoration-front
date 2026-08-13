@@ -8,66 +8,46 @@ import { Employee } from '@/lib/types'
 import EditEmployeeDialog from '@/components/edit-employee-dialog'
 import { DeleteIcon, PencilIcon, SearchIcon, UserPlus2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
-import Swal from 'sweetalert2'
-import { injectSwalStyles, showSuccess } from '@/lib/swal-config'
+import React, { useEffect, useMemo, useState } from 'react'
+import { confirmDelete, showSuccess } from '@/lib/swal-config'
 
 function page() {
 
   const router = useRouter();
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [data, setData] = useState<Employee[]>([]);
   const [search, setSearch] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
   const handleEmployeeSaved = (updated: Employee) => {
     setEmployees(prev => prev.map(employee => employee.id === updated.id ? updated : employee));
-    setData(prev => prev.map(employee => employee.id === updated.id ? updated : employee));
   };
 
   useEffect(() => {
     const fetchEmployees = async () => {
       setLoading(true);
       const response = await getEmployees();
-      setData(response);
       setEmployees(response);
       setLoading(false);
     };
     fetchEmployees();
   }, []);
 
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    if (value === '') {
-      setEmployees(data);
-      return;
-    }
-    const filtered = data.filter((employee) => {
+  // Derived during render: filtering never mutates the source list.
+  const visibleEmployees = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return employees;
+    return employees.filter((employee) => {
       const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
       const email = employee.email.toLowerCase();
-      return fullName.includes(value.toLowerCase()) || email.includes(value.toLowerCase());
+      return fullName.includes(query) || email.includes(query);
     });
-    setEmployees(filtered);
-  };
+  }, [employees, search]);
 
   function onDelete(id: number) {
     return async () => {
-      injectSwalStyles();
-      const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: "No podrás revertir esto",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-        background: '#1a1a1a',
-        color: '#f5f5f0',
-        confirmButtonColor: '#d4af37',
-        cancelButtonColor: '#333333',
-      });
-
-      if (result.isConfirmed) {
+      const confirmed = await confirmDelete();
+      if (confirmed) {
         await deleteEmployee(id);
         showSuccess('¡Eliminado!', 'Empleado eliminado correctamente');
         setEmployees(prev => prev.filter(employee => employee.id !== id));
@@ -85,9 +65,9 @@ function page() {
               type="text" 
               placeholder="Buscar empleados..."
               className="pl-9 w-full sm:w-64"
-              value={search}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
           </div>
         </div>
         <Button onClick={() => router.push("new-employee")}>
@@ -100,7 +80,7 @@ function page() {
         <div className="p-8 text-center text-muted-foreground">
           Cargando...
         </div>
-      ) : employees.length === 0 ? (
+      ) : visibleEmployees.length === 0 ? (
         <div className="p-8 text-center text-muted-foreground">
           No hay empleados para mostrar
         </div>
@@ -117,7 +97,7 @@ function page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {employees.map((employee) => (
+              {visibleEmployees.map((employee) => (
                 <TableRow key={employee.id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
                     {employee.firstName} {employee.lastName}

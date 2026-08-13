@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Card,
   CardHeader,
@@ -12,15 +12,11 @@ import {
   ContractItem,
   ContractModifications,
   Event,
+  Product,
+  ResourceType,
+  Service,
 } from "@/lib/types";
-import { getClient } from "@/api/clients/main";
-import { getEvent } from "@/api/events/main";
-import {
-  getContractItems,
-  getContractModifications,
-} from "@/api/contracts/main";
 import { Badge } from "./ui/badge";
-import { Skeleton } from "./ui/skeleton";
 import { SheetViewer } from "./sheet-generic-viewer";
 import ResourceListItem from "./resource-list-item";
 
@@ -33,39 +29,29 @@ const formatDate = (date: Date) =>
 
 interface ContractCardProps {
   contract: Contract;
+  client?: Client;
+  event?: Event;
+  items: ContractItem[];
+  modifications: ContractModifications[];
+  productsMap: Map<number, Product>;
+  servicesMap: Map<number, Service>;
 }
 
-const ContractCard: React.FC<ContractCardProps> = ({ contract }) => {
-  const [items, setItems] = useState<ContractItem[]>([]);
-  const [modifications, setModifications] = useState<ContractModifications[]>([]);
-  const [client, setClient] = useState<Client | null>(null);
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const [clientData, eventData, allItems, allMods] = await Promise.all([
-          getClient(contract.clientId),
-          getEvent(contract.eventId),
-          getContractItems(),
-          getContractModifications(),
-        ]);
-
-        setClient(clientData);
-        setEvent(eventData);
-        setItems(allItems.filter((item) => item.contractId === contract.id));
-        setModifications(allMods.filter((mod) => mod.contractId === contract.id));
-      } catch (error) {
-        console.error("Error fetching contract data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [contract.id, contract.clientId, contract.eventId]);
-
+// Presentational: the parent page resolves all related data in parallel and
+// passes it here, so rendering N cards does not trigger 4N API calls.
+const ContractCard: React.FC<ContractCardProps> = ({
+  contract,
+  client,
+  event,
+  items,
+  modifications,
+  productsMap,
+  servicesMap,
+}) => {
+  const resourceFor = (item: ContractItem) =>
+    item.type === ResourceType.PRODUCT
+      ? productsMap.get(item.resourceId)
+      : servicesMap.get(item.resourceId);
   return (
     <Card className="minimal-card hover:border-primary/30 transition-colors">
       <CardHeader className="pb-3 border-b border-border">
@@ -85,27 +71,20 @@ const ContractCard: React.FC<ContractCardProps> = ({ contract }) => {
         </p>
       </CardHeader>
       <CardContent className="pt-4">
-        {loading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Badge variant="secondary">
-              {items.length} recurso{items.length !== 1 ? 's' : ''}
+        <div className="flex flex-wrap gap-2 mb-4">
+          <Badge variant="secondary">
+            {items.length} recurso{items.length !== 1 ? 's' : ''}
+          </Badge>
+          {modifications.length > 0 && (
+            <Badge variant="outline">
+              {modifications.length} modificacion{modifications.length !== 1 ? 'es' : ''}
             </Badge>
-            {modifications.length > 0 && (
-              <Badge variant="outline">
-                {modifications.length} modificacion{modifications.length !== 1 ? 'es' : ''}
-              </Badge>
-            )}
-          </div>
-        )}
+          )}
+        </div>
         <SheetViewer
           trigger={
-            <Button variant="outline" size="sm" className="w-full" disabled={loading}>
-              {loading ? "Cargando..." : "Ver detalles"}
+            <Button variant="outline" size="sm" className="w-full">
+              Ver detalles
             </Button>
           }
           title={<></>}
@@ -143,7 +122,11 @@ const ContractCard: React.FC<ContractCardProps> = ({ contract }) => {
                   ) : (
                     <div className="space-y-2">
                       {items.map((item) => (
-                        <ResourceListItem item={item} key={item.id} />
+                        <ResourceListItem
+                          item={item}
+                          resource={resourceFor(item)}
+                          key={item.id}
+                        />
                       ))}
                     </div>
                   )}

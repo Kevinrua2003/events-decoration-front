@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -10,8 +10,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { getEvents } from "@/api/events/main";
-import { EventType } from "@/lib/types";
+import { Event, EventType } from "@/lib/types";
 import {
   ChartContainer,
   ChartTooltipContent,
@@ -45,27 +44,16 @@ interface ChartItem {
   ammount: number;
 }
 
-function EventsChart() {
-  const [chartData, setChartData] = useState<ChartItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      const events = await getEvents();
-
-      const data = categories.map((category) => ({
-        type: typeLabels[category],
-        ammount: events.reduce(
-          (acc, item) => (item.type === category ? acc + 1 : acc),
-          0
-        ),
-      }));
-
-      setChartData(data);
-      setLoading(false);
-    }
-    loadData();
-  }, []);
+function EventsChart({ events, loading }: { events: Event[]; loading?: boolean }) {
+  const chartData = useMemo<ChartItem[]>(() => {
+    return categories.map((category) => ({
+      type: typeLabels[category],
+      ammount: events.reduce(
+        (acc, item) => (item.type === category ? acc + 1 : acc),
+        0
+      ),
+    }));
+  }, [events]);
 
   return (
     <div className="min-h-[250px]">

@@ -6,65 +6,45 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Client } from '@/lib/types'
 import EditClientDialog from '@/components/edit-client-dialog'
 import { DeleteIcon, PencilIcon, SearchIcon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import Swal from 'sweetalert2'
-import { injectSwalStyles, showSuccess } from '@/lib/swal-config'
+import React, { useEffect, useMemo, useState } from 'react'
+import { confirmDelete, showSuccess } from '@/lib/swal-config'
 
 function Clients() {
 
   const [clients, setClients] = useState<Client[]>([]);
-  const [data, setData] = useState<Client[]>([]);
   const [search, setSearch] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
 
   const handleClientSaved = (updated: Client) => {
     setClients(prev => prev.map(client => client.id === updated.id ? updated : client));
-    setData(prev => prev.map(client => client.id === updated.id ? updated : client));
   };
 
   useEffect(() => {
     const fetchClients = async () => {
       setLoading(true);
       const response = await getClients();
-      setData(response);
       setClients(response);
       setLoading(false);
     };
     fetchClients();
   }, []);
 
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    if (value === '') {
-      setClients(data);
-      return;
-    }
-    const filtered = data.filter((client) => {
+  // Derived during render: filtering never mutates the source list.
+  const visibleClients = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return clients;
+    return clients.filter((client) => {
       const fullName = `${client.firstName} ${client.lastName}`.toLowerCase();
       const email = client.email.toLowerCase();
-      return fullName.includes(value.toLowerCase()) || email.includes(value.toLowerCase());
+      return fullName.includes(query) || email.includes(query);
     });
-    setClients(filtered);
-  };
+  }, [clients, search]);
 
   function onDelete(id: number) {
     return async () => {
-      injectSwalStyles();
-      const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: "No podrás revertir esto",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-        background: '#1a1a1a',
-        color: '#f5f5f0',
-        confirmButtonColor: '#d4af37',
-        cancelButtonColor: '#333333',
-      });
-
-      if (result.isConfirmed) {
+      const confirmed = await confirmDelete();
+      if (confirmed) {
         await deleteClient(id);
         showSuccess('¡Eliminado!', 'El cliente ha sido eliminado correctamente');
         setClients(prev => prev.filter(client => client.id !== id));
@@ -82,7 +62,7 @@ function Clients() {
             placeholder="Buscar clientes por nombre o email..."
             className="pl-9"
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
@@ -91,7 +71,7 @@ function Clients() {
         <div className="p-8 text-center text-muted-foreground">
           Cargando...
         </div>
-      ) : clients.length === 0 ? (
+      ) : visibleClients.length === 0 ? (
         <div className="p-8 text-center text-muted-foreground">
           No hay clientes para mostrar
         </div>
@@ -107,7 +87,7 @@ function Clients() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {clients.map((client) => (
+              {visibleClients.map((client) => (
                 <TableRow key={client.id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
                     {client.firstName} {client.lastName}

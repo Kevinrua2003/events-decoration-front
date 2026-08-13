@@ -1,12 +1,12 @@
 import { Client } from "@/lib/types";
 import api from "@/lib/axios";
-import { notFound } from "next/navigation";
-import Swal from "sweetalert2";
+import { Pagination } from "@/api/events/main";
 
-export async function getClients(): Promise<Client[]> {
-    
+export async function getClients({ limit, offset }: Pagination = {}): Promise<Client[]> {
     try {
-        const response = await api.get('/clients');
+        const response = await api.get('/clients', {
+            params: { limit, offset },
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching clients:", error);
@@ -15,7 +15,6 @@ export async function getClients(): Promise<Client[]> {
 }
 
 export async function getClient(clientId: number): Promise<Client> {
-    
     try {
         const response = await api.get(`/clients/${clientId}`);
         return response.data;
@@ -39,7 +38,6 @@ export async function getClientByEmail(email: string): Promise<Client> {
     }
   }
   
-
 export async function createClient(client: Client): Promise<Client> {
     try {
         const { id, ...clientData } = client;

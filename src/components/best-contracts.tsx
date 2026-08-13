@@ -1,8 +1,6 @@
 "use client";
-import { getClients } from "@/api/clients/main";
-import { getContractItems, getContracts } from "@/api/contracts/main";
-import { getEvents } from "@/api/events/main";
-import React, { memo, useEffect, useState } from "react";
+import { Client, Contract, ContractItem, Event } from "@/lib/types";
+import React, { memo, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -35,57 +33,45 @@ const BestContractsRow = memo(function BestContractsRow({ item }: { item: Props 
   );
 });
 
-function BestContracts() {
-  const [listItems, setListItems] = useState<Props[]>([]);
-  const [loading, setLoading] = useState(true);
+interface BestContractsProps {
+  contracts: Contract[];
+  events: Event[];
+  clients: Client[];
+  contractItems: ContractItem[];
+  loading?: boolean;
+}
 
-  useEffect(() => {
-    async function fetchItems() {
-      try {
-        const [contracts, events, clients, contractItems] = await Promise.all([
-          getContracts(),
-          getEvents(),
-          getClients(),
-          getContractItems(),
-        ]);
+function BestContracts({ contracts, events, clients, contractItems, loading }: BestContractsProps) {
+  const listItems = useMemo<Props[]>(() => {
+    const contractItemsMap = contractItems.reduce((acc, item) => {
+      const currentSum = acc.get(item.contractId) || 0;
+      acc.set(item.contractId, currentSum + item.price);
+      return acc;
+    }, new Map<number, number>());
 
-        const contractItemsMap = contractItems.reduce((acc, item) => {
-          const currentSum = acc.get(item.contractId) || 0;
-          acc.set(item.contractId, currentSum + item.price);
-          return acc;
-        }, new Map<number, number>());
+    const eventsMap = new Map(events.map((event) => [event.id, event]));
+    const clientsMap = new Map(clients.map((client) => [client.id, client]));
 
-        const eventsMap = new Map(events.map((event) => [event.id, event]));
-        const clientsMap = new Map(
-          clients.map((client) => [client.id, client])
-        );
+    const list = contracts.map((contract) => {
+      const amount = contractItemsMap.get(contract.id) || 0;
+      const event = eventsMap.get(contract.eventId);
+      const client = clientsMap.get(contract.clientId);
 
-        const list = contracts.map((contract) => {
-          const amount = contractItemsMap.get(contract.id) || 0;
-          const event = eventsMap.get(contract.eventId);
-          const client = clientsMap.get(contract.clientId);
+      return {
+        contractId: contract.id,
+        clientName: client
+          ? `${client.firstName} ${client.lastName}`
+          : "Sin cliente",
+        eventName: event ? event.name : "Sin evento",
+        money: amount,
+      };
+    });
 
-          return {
-            contractId: contract.id,
-            clientName: client
-              ? `${client.firstName} ${client.lastName}`
-              : "Sin cliente",
-            eventName: event ? event.name : "Sin evento",
-            money: amount,
-          };
-        });
-
-        const sorted = list.toSorted((a, b) => b.money - a.money);
-        setListItems(sorted.slice(0, 10));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchItems();
-  }, []);
+    return list
+      .slice()
+      .sort((a, b) => b.money - a.money)
+      .slice(0, 10);
+  }, [contracts, events, clients, contractItems]);
 
   return (
     <div>

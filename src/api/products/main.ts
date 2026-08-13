@@ -1,9 +1,12 @@
 import { Product } from "@/lib/types"
 import api from "@/lib/axios";
+import { Pagination } from "@/api/events/main";
 
-export async function getProducts(): Promise<Product[]> {
+export async function getProducts({ limit, offset }: Pagination = {}): Promise<Product[]> {
     try {
-        const response = await api.get('/products');
+        const response = await api.get('/products', {
+            params: { limit, offset },
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching products:", error);

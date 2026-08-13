@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
     Table,
     TableBody,
@@ -10,7 +10,6 @@ import {
   } from "@/components/ui/table"  
 import { format } from 'date-fns';
 import { DeleteIcon, PackagePlusIcon, PencilIcon, PersonStandingIcon, SearchIcon, UserPlus2Icon } from 'lucide-react';
-import Swal from 'sweetalert2';  
 import { deleteEvent, getEvents } from '@/api/events/main';
 import { Event } from '@/lib/types';
 import EditEventDialog from '@/components/edit-event-dialog';
@@ -18,13 +17,12 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Span from '@/components/Span';
-import { injectSwalStyles, showSuccess } from '@/lib/swal-config';
+import { confirmDelete, showSuccess } from '@/lib/swal-config';
 
   function EventsPage() {
 
     const router = useRouter();
     const [events, setEvents] = useState<Event[]>([]);
-    const [data, setData] = useState<Event[]>([]);
     const [search, setSearch] = useState<string>('');
     const [loading, setLoading] = useState(true);
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -33,47 +31,29 @@ import { injectSwalStyles, showSuccess } from '@/lib/swal-config';
       const fetchEvents = async () => {
         setLoading(true);
         const response = await getEvents();
-        setData(response);
         setEvents(response);
         setLoading(false);
       }
       fetchEvents();
     }, []);
 
+    // Derived during render: no extra state to keep in sync with the source.
+    const visibleEvents = useMemo(() => {
+      const query = search.trim().toLowerCase();
+      if (!query) return events;
+      return events.filter((event) =>
+        event.name.toLowerCase().includes(query)
+      );
+    }, [events, search]);
+
     const handleEventSaved = (updated: Event) => {
       setEvents(prev => prev.map(event => event.id === updated.id ? updated : event));
-      setData(prev => prev.map(event => event.id === updated.id ? updated : event));
-    };
-
-    const handleSearch = (value: string) => {
-      setSearch(value);
-      if (value === '') {
-        setEvents(data);
-        return;
-      }
-      const filtered = data.filter((event) => 
-        event.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setEvents(filtered);
     };
 
     function onDelete(id: number) {
       return async () => {
-        injectSwalStyles();
-        const result = await Swal.fire({
-          title: '¿Estás seguro?',
-          text: "No podrás revertir esto",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Sí, eliminar',
-          cancelButtonText: 'Cancelar',
-          background: '#1a1a1a',
-          color: '#f5f5f0',
-          confirmButtonColor: '#d4af37',
-          cancelButtonColor: '#333333',
-        });
-
-        if (result.isConfirmed) {
+        const confirmed = await confirmDelete();
+        if (confirmed) {
           await deleteEvent(id);
           showSuccess('¡Eliminado!', 'El evento ha sido eliminado');
           setEvents(prev => prev.filter(event => event.id !== id));
@@ -92,7 +72,7 @@ import { injectSwalStyles, showSuccess } from '@/lib/swal-config';
                 placeholder="Buscar eventos..."
                 className="pl-9 w-full sm:w-64"
                 value={search}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
               />
             </div>
           </div>
@@ -106,7 +86,7 @@ import { injectSwalStyles, showSuccess } from '@/lib/swal-config';
           <div className="p-8 text-center text-muted-foreground">
             Cargando...
           </div>
-        ) : events.length === 0 ? (
+        ) : visibleEvents.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground">
             No hay eventos para mostrar
           </div>
@@ -125,7 +105,7 @@ import { injectSwalStyles, showSuccess } from '@/lib/swal-config';
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {events.map((event) => (
+                {visibleEvents.map((event) => (
                   <TableRow key={event.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium truncate max-w-[180px]">
                       {event.name}

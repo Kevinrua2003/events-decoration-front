@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Client, cn, Contract, ContractItem, ResourceType } from "@/lib/types"
+import { Client, Contract, ContractItem, ResourceType } from "@/lib/types"
+import { cn } from "@/lib/utils"
 import { ContactRoundIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useState } from 'react'

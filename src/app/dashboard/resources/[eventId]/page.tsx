@@ -46,9 +46,12 @@ function ResourcesPage() {
 
 
   useEffect(() => {
+    // Independent fetches run in parallel (no sequential waterfall).
     const fetchResources = async () => {
-      const productResponse = await getProducts();
-      const serviceResponse = await getServices();
+      const [productResponse, serviceResponse] = await Promise.all([
+        getProducts(),
+        getServices(),
+      ]);
       setProducts(productResponse);
       setServices(serviceResponse);
     }

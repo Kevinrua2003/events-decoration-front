@@ -1,9 +1,12 @@
 import { Service } from "@/lib/types"
 import api from "@/lib/axios";
+import { Pagination } from "@/api/events/main";
 
-export async function getServices(): Promise<Service[]> {
+export async function getServices({ limit, offset }: Pagination = {}): Promise<Service[]> {
     try {
-        const response = await api.get('/services');
+        const response = await api.get('/services', {
+            params: { limit, offset },
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching services:", error);

@@ -1,10 +1,16 @@
 import { Event } from "@/lib/types";
 import api from "@/lib/axios";
 
-export async function getEvents(): Promise<Event[]> {
-    
+export interface Pagination {
+  limit?: number;
+  offset?: number;
+}
+
+export async function getEvents({ limit, offset }: Pagination = {}): Promise<Event[]> {
     try {
-        const response = await api.get('/events');
+        const response = await api.get('/events', {
+            params: { limit, offset },
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching events:", error);
@@ -12,8 +18,8 @@ export async function getEvents(): Promise<Event[]> {
     }
 }
 
+
 export async function getEvent(eventId: number): Promise<Event> {
-    
     try {
         const response = await api.get(`/events/${eventId}`);
         return response.data;

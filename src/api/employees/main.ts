@@ -1,10 +1,12 @@
 import { Employee, EmployeeInput } from "@/lib/types";
 import api from "@/lib/axios";
+import { Pagination } from "@/api/events/main";
 
-export async function getEmployees(): Promise<Employee[]> {
-    
+export async function getEmployees({ limit, offset }: Pagination = {}): Promise<Employee[]> {
     try {
-        const response = await api.get('/employees');
+        const response = await api.get('/employees', {
+            params: { limit, offset },
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching employees:", error);

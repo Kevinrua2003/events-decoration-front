@@ -225,3 +225,24 @@ export const showWarning = (title: string, message: string) => {
     confirmButtonColor: '#d4af37',
   });
 };
+
+/** Shared destructive-action confirmation used by the list pages. */
+export const confirmDelete = async (
+  title = '¿Estás seguro?',
+  text = 'No podrás revertir esto',
+): Promise<boolean> => {
+  injectSwalStyles();
+  const result = await Swal.fire({
+    title,
+    text,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    background: '#1a1a1a',
+    color: '#f5f5f0',
+    confirmButtonColor: '#d4af37',
+    cancelButtonColor: '#333333',
+  });
+  return result.isConfirmed === true;
+};
