@@ -156,7 +156,7 @@ function Page() {
         </div>
         <input type="text" id="swal-input-name" class="swal2-input" placeholder="Nombre">
         <input type="number" id="swal-input-price" class="swal2-input" placeholder="Precio">
-        <input type="text" id="swal-input-image" class="swal2-input" placeholder="URL de imagen (solo productos)">
+        <input type="file" id="swal-input-image" class="swal2-file" accept="image/*" style="color: #f5f5f0;">
         <textarea id="swal-input-description" class="swal2-textarea" placeholder="Descripción (solo servicios)"></textarea>
       </div>
     `,
@@ -187,9 +187,8 @@ function Page() {
         }
 
         if (resourceType === "product") {
-          const image = (
-            document.getElementById("swal-input-image") as HTMLInputElement
-          )?.value.trim();
+          const imageInput = document.getElementById("swal-input-image") as HTMLInputElement;
+          const image = imageInput?.files?.[0] ?? null;
           return { resourceType, name, price, image };
         } else {
           const description = (
@@ -205,15 +204,13 @@ function Page() {
     if (result.isConfirmed && result.value) {
       try {
         if (result.value.resourceType === "product") {
-          const prod: Product = {
-            id: 0,
+          const prod: Pick<Product, 'name' | 'price' | 'providerId'> = {
             name: result.value.name,
             price: Number(result.value.price),
-            image: result.value.image || '',
             providerId: providerId,
           };
-          await createProduct(prod);
-          setProducts([...products, prod]);
+          const created = await createProduct(prod, result.value.image);
+          setProducts([...products, created]);
         } else {
           const serv: Service = {
             id: 0,

@@ -24,10 +24,17 @@ export async function getProduct(prodId: number): Promise<Product> {
     }
 }
 
-export async function createProduct(product: Product): Promise<Product> {
+export async function createProduct(
+  product: Pick<Product, 'name' | 'price' | 'providerId'>,
+  imageFile?: File,
+): Promise<Product> {
     try {
-        const { id, ...productData } = product;
-        const response = await api.post('/products', productData);
+        const formData = new FormData();
+        formData.append('name', product.name);
+        formData.append('price', String(product.price));
+        formData.append('providerId', String(product.providerId));
+        if (imageFile) formData.append('image', imageFile);
+        const response = await api.post('/products', formData);
         return response.data;
     } catch (error) {
         console.error("Error creating product:", error);
